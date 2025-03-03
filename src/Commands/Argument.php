@@ -2,8 +2,6 @@
 
 namespace Commands;
 
-use PhpParser\ErrorHandler\Throwing;
-
 class Argument {
 
     private string $argument;
