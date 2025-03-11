@@ -25,6 +25,9 @@ class CodeGeneration extends AbstractCommand {
         if ($codeGenType == "migration") {
             $migrationName = $this->getArgumentValue("name");
             $this->generatedMigrationFile($migrationName); 
+        } else if ($codeGenType == "seeder") {
+            $seederName = $this->getArgumentValue("name");
+            $this->generateSeederFile($seederName);
         }
 
         return 0;
@@ -42,13 +45,14 @@ class CodeGeneration extends AbstractCommand {
 
         // マイグレーションファイルを保存するディレクトリとパス
         $directory = sprintf("%s/../../Database/Migrations", __DIR__);
-        $path = sprintf("%s/%s", $directory, $filename);
 
         // ディレクトリの存在確認と作成
         if (!is_dir($directory)) {
-            mkdir($directory, 0755, true); // 再帰的にディレクトリを作成
+            mkdir($directory, 0755, true);
             $this->log("Directory {$directory} has been created!");
         }
+
+        $path = sprintf("%s/%s", $directory, $filename);
 
         file_put_contents($path, $migrationContent);
         $this->log("Migration file {$filename} has been generated!");
@@ -59,6 +63,7 @@ class CodeGeneration extends AbstractCommand {
 
         return <<<MIGRATION
         <?php
+
         namespace Database\Migrations;
         
         use Database\SchemaMigration;
@@ -75,6 +80,50 @@ class CodeGeneration extends AbstractCommand {
             }
         }
         MIGRATION;
+    }
+
+    private function generateSeederFile(string $seederName): void {
+        $filename = sprintf("%s.php", $seederName);
+
+        $seederContent = $this->getSeederContent($seederName);
+
+        $directory = sprintf("%s/../../Database/Seeds", __DIR__);
+
+        if (!is_dir($directory)) {
+            mkdir($directory, 0755, true);
+            $this->log("Directory {$directory} has been created!");
+        }
+
+        $path = sprintf("%s/%s", $directory, $filename);
+
+        file_put_contents($path, $seederContent);
+        $this->log("Seeder file {$filename} has been generated!");
+    }
+
+    private function getSeederContent(string $seederName): string {
+        $className = $this->pascalCase($seederName);
+
+        return <<<SEEDER
+        <?php
+
+        namespace Database\Seeds;
+
+        use Faker\Factory;
+        use Database\AbstractSeeder;
+
+        class {$className} extends AbstractSeeder {
+            // TODO: tableName文字列の割り当て
+            protected ?string \$tableName = null;
+
+            // TODO: tableColumns配列の割り当て
+            protected array \$tableColumns = [];
+
+            public function createRowData(): array {
+                // TODO: createRowData()メソッドの実装
+                return [];
+            }
+        }          
+        SEEDER;
     }
 
     private function pascalCase(string $string): string {
