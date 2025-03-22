@@ -10,7 +10,6 @@ if (Settings::env("ENVIRONMENT") === "proc") {
     $DEBUG = true;
 }
 
-
 if (preg_match('/\.(?:png|jpg|jpeg|gif|js|css|html)$/', $_SERVER["REQUEST_URI"])) {
     return false;
 }
