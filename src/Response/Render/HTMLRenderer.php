@@ -26,10 +26,10 @@ class HTMLRenderer implements HTTPRenderer {
         if (!file_exists($viewPath)) {
             throw new \Exception("View file {$viewPath} does not exists.");
         }
-
+        
         ob_start();
         extract($this->data);
-        require $viewPath; 
+        require $viewPath;
         return $this->getHeader() . ob_get_clean() . $this->getFooter();
     }
 
