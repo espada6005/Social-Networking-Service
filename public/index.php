@@ -1,8 +1,15 @@
 <?php
 
+use Helpers\Settings;
+
 require_once "../vendor/autoload.php";
 
-$DEBUG = true;
+if (Settings::env("ENVIRONMENT") === "proc") {
+    $DEBUG = false;
+} else {
+    $DEBUG = true;
+}
+
 
 if (preg_match('/\.(?:png|jpg|jpeg|gif|js|css|html)$/', $_SERVER["REQUEST_URI"])) {
     return false;
