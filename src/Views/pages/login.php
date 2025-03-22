@@ -1,8 +1,3 @@
-<?php
-$css_file = "login";
-include("../src/Views/layout/header.php");
-?>
-
 <div class="login-container">
     <h1>ログイン</h1>
     <form id="loginForm">
