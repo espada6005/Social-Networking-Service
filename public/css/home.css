@@ -1,0 +1,170 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #fff;
+    text-align: center;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(45deg, #8e44ad, #3498db);
+    z-index: -1;
+}
+
+header {
+    margin-top: 50px;
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.tagline {
+    font-size: 1.2rem;
+    font-style: italic;
+    margin-bottom: 20px;
+}
+
+/* 白い線で囲むデザイン */
+.container {
+    background-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 30px;
+    width: 90%;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+a {
+    background: rgba(255, 255, 255, 0.8);
+    color: #8e44ad;
+    font-weight: bold;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    width: 90%;
+    text-decoration: none;
+}
+
+a:hover {
+    background: rgba(255, 255, 255, 1);
+}
+
+button {
+    background: rgba(255, 255, 255, 0.8);
+    color: #8e44ad;
+    font-weight: bold;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    width: 100%; /* ボタンを枠内にフィット */
+}
+
+
+.separator {
+    display: flex;
+    align-items: center;
+    width: 100%; /* 横幅を設定 */
+    margin: 10px 0;
+}
+
+.separator::before, .separator::after {
+    content: "";
+    flex: 1;
+    border-top: 1px solid #fff; /* 傍線を追加 */
+    margin: 0 10px; /* 線とテキストの間隔 */
+}
+
+.separator span {
+    font-size: 1rem;
+    color: #fff;
+}
+
+.guest-warning {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #fff;
+    text-align: justify;
+    padding: 10px 20px;
+    background: rgba(0, 0, 0, 0.5); /* 背景を半透明に */
+    border-radius: 10px;
+    max-width: 400px;
+    margin: 0 auto; /* 中央寄せ */
+}
+
+.guest-warning p {
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2rem;
+    }
+
+    .tagline {
+        font-size: 1rem;
+    }
+
+    .container {
+        padding: 15px;
+        margin: 50px auto; /* 画面幅が狭い時の外側の余白を増加 */
+    }
+
+    button {
+        font-size: 0.9rem;
+        padding: 8px 15px;
+    }
+
+    .separator span {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    .tagline {
+        font-size: 0.8rem;
+    }
+
+    .container {
+        padding: 10px;
+        margin: 60px auto; /* スマートフォン用にさらに余白を増加 */
+    }
+
+    button {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+
+    .separator span {
+        font-size: 0.8rem;
+    }
+}
+
