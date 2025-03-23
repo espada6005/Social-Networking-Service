@@ -3,6 +3,10 @@ body {
     margin: 0;
     padding: 0;
     color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
 body::before {
@@ -21,10 +25,6 @@ h1 {
 }
 
 .login-container {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
     padding: 20px;
     width: 90%;
     max-width: 400px;
