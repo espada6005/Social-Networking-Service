@@ -2,21 +2,58 @@
     <h1>Welcome to SNS Service</h1>
     <p class="tagline">Connect, Share, and Explore</p>
 </header>
-<main>
-    <!-- 注意書きとボタンを囲む枠 -->
-    <div class="container">
-        <div class="buttons">
-            <a href="/login">ログイン</a>
-            <a href="/register">ユーザー登録</a>
-            <div class="separator">
-                <span>または</span>
-            </div>
-            <a href="/login">ゲストログイン</a>
-        </div>
-        <div class="guest-warning">
-            <p>ゲストログインで使用するアカウントは、他のユーザーとの共有アカウントになるため、ログイン後の操作では個人情報や機密情報を扱わないようにしてください。<br>
-                ゲストアカウントの操作による情報漏洩やデータの損失について、当サービスは一切の責任を負いかねます。<br>
-                また、ゲストユーザーのアカウントに紐づくデータは、予告せず管理者側で削除する可能性があります。</p>
-        </div>
-    </div>
-</main>
+<div class="login-wrap">
+	<div class="login-html">
+		<input id="tab-1" type="radio" name="tab" class="sign-in" checked>
+        <label for="tab-1" class="tab">ログイン</label>
+		<input id="tab-2" type="radio" name="tab" class="sign-up">
+        <label for="tab-2" class="tab">新規登録</label>
+		<div class="login-form">
+			<div class="sign-in-htm">
+				<div class="group">
+					<label for="user" class="label">ユーザー名</label>
+					<input id="user" type="text" class="input">
+				</div>
+				<div class="group">
+					<label for="pass" class="label">パスワード</label>
+					<input id="pass" type="password" class="input" data-type="password">
+				</div>
+				<div class="group">
+					<input type="submit" class="login-btn" value="ログイン">
+				</div>
+                <div class="foot-lnk">
+					<a href="#forgot">パスワードを忘れた方はこちら</a>
+				</div>
+				<div class="hr"></div>
+                <div class="group">
+					<input type="submit" class="guest-btn" value="ゲストログイン">
+				</div>
+			</div>
+			<div class="sign-up-htm">
+            <div class="group">
+					<label for="user" class="label">名前</label>
+					<input id="user" type="text" class="input">
+				</div>
+				<div class="group">
+					<label for="user" class="label">ユーザー名</label>
+					<input id="user" type="text" class="input">
+				</div>
+				<div class="group">
+					<label for="pass" class="label">メールアドレス</label>
+					<input id="pass" type="text" class="input">
+				</div>
+                <div class="group">
+					<label for="pass" class="label">パスワード</label>
+					<input id="pass" type="password" class="input" data-type="password">
+				</div>
+				<div class="group">
+					<label for="pass" class="label">パスワード確認用</label>
+					<input id="pass" type="password" class="input" data-type="password">
+				</div>
+				<div class="group">
+					<input type="submit" class="regist-btn" value="登録">
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

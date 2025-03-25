@@ -1,9 +1,9 @@
 body {
-    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    color: #fff;
-    text-align: center;
+    color: #6a6f8c;
+    font: 600 16px/18px 'Open Sans', sans-serif;
+    height: 100%;
 }
 
 body::before {
@@ -13,12 +13,31 @@ body::before {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: linear-gradient(45deg, #8e44ad, #3498db);
+    background: linear-gradient(45deg,  rgba(66, 183, 245,0.8) 0%,rgba(66, 245, 189,0.4) 100%);
     z-index: -1;
 }
 
+*,
+:after,
+:before {
+    box-sizing: border-box
+}
+
+.clearfix:after,
+.clearfix:before {
+    content: '';
+    display: table
+}
+
+.clearfix:after {
+    clear: both;
+    display: block
+}
+
 header {
+    text-align: center;
     margin-top: 50px;
+    margin-bottom: 50px;
 }
 
 h1 {
@@ -32,139 +51,189 @@ h1 {
     margin-bottom: 20px;
 }
 
-/* 白い線で囲むデザイン */
-.container {
-    background-color: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
-    border-radius: 10px;
-    padding: 20px;
-    margin-top: 30px;
-    width: 90%;
-    max-width: 400px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.buttons {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 20px;
-}
-
 a {
-    background: rgba(255, 255, 255, 0.8);
-    color: #8e44ad;
-    font-weight: bold;
+    color: inherit;
+    text-decoration: none
+}
+
+.login-wrap {
+    width: 100%;
+    margin: auto;
+    max-width: 525px;
+    min-height: 670px;
+    position: relative;
+    box-shadow: 0 12px 15px 0 rgba(0, 0, 0, .24), 0 17px 50px 0 rgba(0, 0, 0, .19);
+}
+
+.login-html {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    padding: 50px 70px;
+    background: #fff;
+}
+
+.login-html .sign-in-htm,
+.login-html .sign-up-htm {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: absolute;
+    transform: rotateY(180deg);
+    backface-visibility: hidden;
+    transition: all .4s linear;
+}
+
+.login-html .sign-in,
+.login-html .sign-up,
+.login-form .group .check {
+    display: none;
+}
+
+.login-html .tab,
+.login-form .group .label,
+.login-form .group .login-btn,
+.guest-btn, .regist-btn {
+    text-transform: uppercase;
+}
+
+.login-html .tab {
+    font-size: 22px;
+    margin-right: 15px;
+    padding-bottom: 5px;
+    margin: 0 15px 30px 0;
+    display: inline-block;
+    border-bottom: 2px solid transparent;
+}
+
+.login-html .sign-in:checked+.tab,
+.login-html .sign-up:checked+.tab {
+    color: #1161ee;
+    border-color: #1161ee;
+}
+
+.login-form {
+    min-height: 345px;
+    position: relative;
+    perspective: 1000px;
+    transform-style: preserve-3d;
+}
+
+.login-form .group {
+    margin-bottom: 15px;
+}
+
+.login-form .group .label,
+.login-form .group .input,
+.login-form .group .login-btn,
+.guest-btn, .regist-btn {
+    width: 100%;
+    display: block;
+}
+
+.login-form .group .input,
+.login-form .group .login-btn,
+.guest-btn, .regist-btn {
+    font-size: 1.2rem;
     border: none;
-    padding: 10px 20px;
-    font-size: 1rem;
+    padding: 10px 15px;
     border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.3s;
-    width: 90%;
-    text-decoration: none;
+    background: rgba(0, 0, 0, 0.1);
 }
 
-a:hover {
-    background: rgba(255, 255, 255, 1);
+.login-form .group .input {
+    outline: none;
+    color: rgba(0, 0, 0, 0.8);
 }
 
-button {
-    background: rgba(255, 255, 255, 0.8);
-    color: #8e44ad;
-    font-weight: bold;
-    border: none;
-    padding: 10px 20px;
-    font-size: 1rem;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.3s;
-    width: 100%; /* ボタンを枠内にフィット */
+.login-form .group .login-btn, .regist-btn {
+    color: #fff;
+    background: #1161ee;
 }
 
-
-.separator {
-    display: flex;
-    align-items: center;
-    width: 100%; /* 横幅を設定 */
-    margin: 10px 0;
+.login-form .group .guest-btn {
+    color: #1161ee;
+    background: #fff;
+    border:#1161ee 1px solid;
 }
 
-.separator::before, .separator::after {
-    content: "";
-    flex: 1;
-    border-top: 1px solid #fff; /* 傍線を追加 */
-    margin: 0 10px; /* 線とテキストの間隔 */
+.login-form .group .login-btn ,.regist-btn {
+    margin-top: 30px;
 }
 
-.separator span {
-    font-size: 1rem;
+.login-form .group input[data-type="password"] {
+    -webkit-text-security: circle;
+}
+
+.login-form .group .label {
+    color: #aaa;
+    font-size: 12px;
+}
+
+.login-form .group label .icon {
+    width: 15px;
+    height: 15px;
+    border-radius: 2px;
+    position: relative;
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.login-form .group label .icon:before,
+.login-form .group label .icon:after {
+    content: '';
+    width: 10px;
+    height: 2px;
+    background: #fff;
+    position: absolute;
+    transition: all .2s ease-in-out 0s;
+}
+
+.login-form .group label .icon:before {
+    left: 3px;
+    width: 5px;
+    bottom: 6px;
+    transform: scale(0) rotate(0);
+}
+
+.login-form .group label .icon:after {
+    top: 6px;
+    right: 0;
+    transform: scale(0) rotate(0);
+}
+
+.login-form .group .check:checked+label {
     color: #fff;
 }
 
-.guest-warning {
-    font-size: 0.9rem;
-    line-height: 1.6;
-    color: #fff;
-    text-align: justify;
-    padding: 10px 20px;
-    background: rgba(0, 0, 0, 0.5); /* 背景を半透明に */
-    border-radius: 10px;
-    max-width: 400px;
-    margin: 0 auto; /* 中央寄せ */
+.login-form .group .check:checked+label .icon {
+    background: #1161ee;
 }
 
-.guest-warning p {
-    margin: 0;
+.login-form .group .check:checked+label .icon:before {
+    transform: scale(1) rotate(45deg);
 }
 
-@media (max-width: 768px) {
-    h1 {
-        font-size: 2rem;
-    }
-
-    .tagline {
-        font-size: 1rem;
-    }
-
-    .container {
-        padding: 15px;
-        margin: 50px auto; /* 画面幅が狭い時の外側の余白を増加 */
-    }
-
-    button {
-        font-size: 0.9rem;
-        padding: 8px 15px;
-    }
-
-    .separator span {
-        font-size: 0.9rem;
-    }
+.login-form .group .check:checked+label .icon:after {
+    transform: scale(1) rotate(-45deg);
 }
 
-@media (max-width: 480px) {
-    h1 {
-        font-size: 1.8rem;
-    }
-
-    .tagline {
-        font-size: 0.8rem;
-    }
-
-    .container {
-        padding: 10px;
-        margin: 60px auto; /* スマートフォン用にさらに余白を増加 */
-    }
-
-    button {
-        font-size: 0.8rem;
-        padding: 6px 12px;
-    }
-
-    .separator span {
-        font-size: 0.8rem;
-    }
+.login-html .sign-in:checked+.tab+.sign-up+.tab+.login-form .sign-in-htm {
+    transform: rotate(0);
 }
 
+.login-html .sign-up:checked+.tab+.login-form .sign-up-htm {
+    transform: rotate(0);
+}
+
+.hr {
+    height: 2px;
+    margin: 60px 0 50px 0;
+    background: rgba(0, 0, 0, .1);
+}
+
+.foot-lnk {
+    margin-top: 30px;
+    text-align: center;
+}
