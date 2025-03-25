@@ -58,7 +58,7 @@ a {
 
 .login-wrap {
     width: 100%;
-    margin: auto;
+    margin: auto; 
     max-width: 525px;
     min-height: 670px;
     position: relative;
@@ -89,13 +89,6 @@ a {
 .login-html .sign-up,
 .login-form .group .check {
     display: none;
-}
-
-.login-html .tab,
-.login-form .group .label,
-.login-form .group .login-btn,
-.guest-btn, .regist-btn {
-    text-transform: uppercase;
 }
 
 .login-html .tab {
@@ -169,6 +162,12 @@ a {
 .login-form .group .label {
     color: #aaa;
     font-size: 12px;
+}
+
+.login-btn:hover,
+.guest-btn:hover,
+.regist-btn:hover {
+    cursor: pointer;
 }
 
 .login-form .group label .icon {
