@@ -5,7 +5,7 @@ body::before {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: linear-gradient(90deg, rgba(65, 164, 253, 0.7), rgba(14, 244, 255, 0.7));
+    background: linear-gradient(45deg, #46c6f8, #19ce5a);
     z-index: -1;
 }
 
