@@ -21,7 +21,6 @@ p {
     color: #6a6f8c;
     ;
     font-size: 1.2rem;
-    /* タブ文字サイズ */
 }
 
 .nav-underline .nav-link.active,
@@ -31,5 +30,4 @@ p {
 
 .btn {
     font-size: 1.1rem;
-    /* ボタン文字サイズ */
 }
