@@ -30,7 +30,7 @@
                     <a href="#forgot">パスワードを忘れた方はこちら</a>
                 </div>
                 <hr>
-                <button type="button" class="btn btn-outline-primary w-100 mt-3">ゲストログイン</button>
+                <button type="button" class="btn btn-secondary w-100 mt-3">ゲストログイン</button>
             </div>
             <!-- 新規登録フォーム -->
             <div class="tab-pane fade" id="register" role="tabpanel" aria-labelledby="register-tab">
