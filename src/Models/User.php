@@ -31,7 +31,7 @@ class User implements Model {
         private string $name,
         private string $username,
         private string $email,
-        private string $type,
+        private string $type = "user",
         private ?string $profile_text = null,
         private ?string $profile_image_hash = null,
         private ?string $email_confirmed_at = null,
