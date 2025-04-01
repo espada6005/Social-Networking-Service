@@ -56,11 +56,11 @@
                     <div class="mb-3">
                         <label for="register-confirm-password" class="form-label">パスワード確認用</label>
                         <input type="password" class="form-control" id="register-confirm-password" name="confirm_password">
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100" id="register-btn">登録</button>
+                    </div>  egister-btn">登録</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
-<script src="js/reregister.js"></script>
+<script src="js/common.js"></script>
+<script src="js/register.js"></script>
