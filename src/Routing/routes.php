@@ -6,9 +6,11 @@ use Helpers\MailSender;
 use Helpers\Settings;
 use Helpers\ValidationHelper;
 use Models\User;
+use Response\FlashData;
 use Response\HTTPRenderer;
 use Response\Render\HTMLRenderer;
 use Response\Render\JSONRenderer;
+use Response\Render\RedirectRenderer;
 use Routing\Route;
 use Types\ValueType;
 
@@ -96,4 +98,36 @@ return [
             return new JSONRenderer(["status" => "error", "message" => $e->getMessage()]);
         }
     })->setMiddleware(["guest"]),
+    // メール認証
+    "verify/email" => Route::create("verify/email", function (): HTTPRenderer {
+        try {
+            // ログイン済みユーザーを取得
+            $authenticatedUser = Authenticate::getAuthenticatedUser();
+
+            $hashedUserId = hash_hmac("sha256", $authenticatedUser->getId(), Settings::env("SECRET_KEY"));
+            $hashedEmail = hash_hmac("sha256", $authenticatedUser->getEmail(), Settings::env("SECRET_KEY"));
+
+            $expectedHashedId = $_GET["id"];
+            $expectedHashedEmail = $_GET["user"];
+
+            if (!hash_equals($hashedUserId, $expectedHashedId) || !hash_equals($hashedEmail, $expectedHashedEmail)) {
+                throw new Exception("Invalid verification link");
+            }
+
+            $userDao = DAOFactory::getUserDAO();
+            $result = $userDao->updateEmailConfirmedAt($authenticatedUser->getId());
+
+            if (!$result) {
+                throw new Exception("メール認証に失敗しました");
+            }
+
+            FlashData::setFlashData("success", "メール認証が完了しました");
+
+            return new HTMLRenderer("pages/user", []);
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            FlashData::setFlashData("error", "メール認証に失敗しました");
+            return new RedirectRenderer("/email/verify/resend");
+        }
+    })->setMiddleware(["auth", "signature", ]),
 ];
