@@ -123,11 +123,11 @@ return [
 
             FlashData::setFlashData("success", "メール認証が完了しました");
 
-            return new HTMLRenderer("pages/user", []);
+            return new RedirectRenderer("user");
         } catch (\Exception $e) {
             error_log($e->getMessage());
             FlashData::setFlashData("error", "メール認証に失敗しました");
-            return new RedirectRenderer("/email/verify/resend");
+            return new RedirectRenderer("verify/resend");
         }
-    })->setMiddleware(["auth", "signature", ]),
+    })->setMiddleware(["auth", "signature"]),
 ];
