@@ -15,7 +15,7 @@ use Routing\Route;
 use Types\ValueType;
 
 return [
-     // トップページ
+    // トップページ
     "" => Route::create("", function (): HTTPRenderer {
         return new HTMLRenderer("pages/top", []);
     })->setMiddleware(["guest"]),
@@ -98,6 +98,10 @@ return [
             return new JSONRenderer(["status" => "error", "message" => $e->getMessage()]);
         }
     })->setMiddleware(["guest"]),
+    // メール送信後
+    "verify/resend" => Route::create("verify/resend", function (): HTTPRenderer {
+        return new HTMLRenderer("pages/verify_resend", []);
+    })->setMiddleware(["auth"]),
     // メール認証
     "verify/email" => Route::create("verify/email", function (): HTTPRenderer {
         try {
