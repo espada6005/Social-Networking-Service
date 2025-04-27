@@ -2,7 +2,6 @@
 
 namespace Helpers;
 
-use Models\User;
 use Types\ValueType;
 
 class ValidationHelper {
@@ -46,8 +45,8 @@ class ValidationHelper {
     public static function validateString(string $value): bool {
         return is_string($value) 
             && preg_replace("/\A[\p{Cc}\p{Cf}\p{Z}]++|[\p{Cc}\p{Cf}\p{Z}]++\z/u", "", $value)
-            && strlen($value) >= User::MIN_LENS["name"]
-            && strlen($value) <= User::MAX_LENS["name"];
+            && strlen($value) >= 1
+            && strlen($value) <= 50;
     }
 
     public static function validateEmail(string $value): bool {
