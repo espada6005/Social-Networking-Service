@@ -1,0 +1,29 @@
+@charset "UTF-8";
+
+body {
+    height: 100vh;
+    background: linear-gradient(45deg, #3191f0, #a99ffe);
+}
+
+header {
+    color: #fff;
+}
+
+p {
+    font-style: italic;
+}
+
+.nav-link {
+    color: #6a6f8c;
+    ;
+    font-size: 1.2rem;
+}
+
+.nav-underline .nav-link.active,
+.nav-underline .show>.nav-link {
+    color: #0d6efd;
+}
+
+.btn {
+    font-size: 1.1rem;
+}
