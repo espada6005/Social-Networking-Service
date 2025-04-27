@@ -2,6 +2,7 @@
 
 namespace Response\Render;
 
+use Helpers\Authenticate;
 use Response\HTTPRenderer;
 
 class HTMLRenderer implements HTTPRenderer {
@@ -35,7 +36,10 @@ class HTMLRenderer implements HTTPRenderer {
 
     private function getHeader(): string {
         ob_start();
+        $user = Authenticate::getAuthenticatedUser();
         require $this->getViewPath("layout/header");
+        require $this->getViewPath("component/message-boxes");
+        require $this->getViewPath("component/sidebar");
         return ob_get_clean();
     }
 
