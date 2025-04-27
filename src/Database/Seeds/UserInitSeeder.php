@@ -5,7 +5,6 @@ namespace Database\Seeds;
 use Faker\Factory; 
 use Database\AbstractSeeder;
 use Helpers\DateTimeHelper;
-use Models\User;
 
 require 'vendor/autoload.php';
 
@@ -58,7 +57,7 @@ class UserInitSeeder extends AbstractSeeder {
                 $faker->word() . "u" . $i,
                 "user" . $i . "@example.com",
                 password_hash($faker->password(), PASSWORD_DEFAULT),
-                $faker->text(User::MAX_LENS["profile_text"]),
+                $faker->text(100),
                 $type,
                 DateTimeHelper::formatDateTime(DateTimeHelper::getCurrentDateTime()),
             ];
