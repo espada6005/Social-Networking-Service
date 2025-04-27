@@ -11,21 +11,6 @@ class User implements Model {
 
     private const TYPE_VALUES = ["USER"];
 
-    public const MIN_LENS = [
-        "name" => 1,
-        "username" => 1,
-        "email" => 1,
-        "profile_tect" => 0,
-    ];
-
-    public const MAX_LENS = [
-        "name" => 50,
-        "username" => 20,
-        "email" => 320,
-        "profile_text" => 160,
-    ];
-
-
     public function __construct(
         private string $name,
         private string $username,
