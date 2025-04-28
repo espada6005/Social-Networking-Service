@@ -1,6 +1,7 @@
 <?php
 
 use Database\DataAccess\DAOFactory;
+use Exceptions\AuthenticationFailureException;
 use Helpers\Authenticate;
 use Helpers\MailSender;
 use Helpers\Settings;
@@ -19,6 +20,38 @@ return [
     "" => Route::create("", function (): HTTPRenderer {
         return new HTMLRenderer("pages/top", []);
     })->setMiddleware(["guest"]),
+    // ログイン
+    "form/login" => Route::create("form/login", function (): HTTPRenderer {
+        try {
+            if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+                throw new Exception("Invalid request method");
+            }
+
+            // 入力値検証
+            $fieldErrors = ValidationHelper::validateFields([
+                "email" => ValueType::EMAIL,
+                "password" => ValueType::PASSWORD,
+            ], $_POST);
+
+            if (!empty($fieldErrors)) {
+                return new JSONRenderer(["status" => "fieldErrors", "message" => $fieldErrors]);
+            }
+
+            // ユーザー認証
+            $user = Authenticate::authenticate($_POST["email"], $_POST["password"]);
+
+            return new JSONRenderer(["status" => "success", "redirectUrl" => "timeline"]);
+        } catch (AuthenticationFailureException $e) {
+            return new JSONRenderer(["status" => "error", "message" => $e->getMessage()]);
+        } catch (\Exception $e) {
+            return new JSONRenderer(["status" => "error", "message" => $e->getMessage()]);
+        }
+    })->setMiddleware(["guest"]),
+    // ログアウト
+    "logout" => Route::create("logout", function (): HTTPRenderer {
+        Authenticate::logoutUser();
+        return new RedirectRenderer("");
+    })->setMiddleware(["auth"]),
     // ユーザー登録
     "form/register" => Route::create("form/register", function (): HTTPRenderer {
         try {
@@ -134,4 +167,7 @@ return [
             return new RedirectRenderer("verify/resend");
         }
     })->setMiddleware(["auth", "signature"]),
+    "timeline" => Route::create("timeline", function (): HTTPRenderer {
+        return new HTMLRenderer("pages/timeline", []);
+    })->setMiddleware(["auth", "verify"]),
 ];
