@@ -1,0 +1,30 @@
+@charset "UTF-8";
+
+.sidebar, 
+.offcanvas {
+    width: 259px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #343a40;
+    padding-top: 20px;
+}
+
+.sidebar .nav-link,
+.offcanvas .nav-link {
+    color: #fff;
+    font-size: 18px;
+}
+
+.sidebar .nav-link:hover,
+.offcanvas .nav-link:hover {
+    background-color: #495057;
+}
+
+.menu-button {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1050;
+}
