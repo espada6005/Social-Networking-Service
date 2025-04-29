@@ -133,7 +133,7 @@ return [
     })->setMiddleware(["guest"]),
     // メール送信後
     "verify/resend" => Route::create("verify/resend", function (): HTTPRenderer {
-        return new HTMLRenderer("pages/verify_resend", []);
+        return new HTMLRenderer("pages/verify-resend", []);
     })->setMiddleware(["auth"]),
     // メール認証
     "verify/email" => Route::create("verify/email", function (): HTTPRenderer {
@@ -170,4 +170,5 @@ return [
     "timeline" => Route::create("timeline", function (): HTTPRenderer {
         return new HTMLRenderer("pages/timeline", []);
     })->setMiddleware(["auth", "verify"]),
+
 ];
