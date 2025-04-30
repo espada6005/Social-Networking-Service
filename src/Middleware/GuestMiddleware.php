@@ -4,6 +4,7 @@ namespace Middleware;
 
 use Helpers\Authenticate;
 use Response\HTTPRenderer;
+use Response\Render\RedirectRenderer;
 
 class GuestMiddleware implements Middleware {
 
@@ -12,7 +13,7 @@ class GuestMiddleware implements Middleware {
 
         // ユーザーがログインしている場合は、メッセージなしでランダムパーツのページにリダイレクトする
         if (Authenticate::isLoggedin()) {
-            
+            return new RedirectRenderer("timeline");
         }
 
         return $next();
