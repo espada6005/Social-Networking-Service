@@ -13,7 +13,7 @@
             <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-home me-2"></i> ホーム</a></li>
             <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-bell me-2"></i> 通知</a></li>
             <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-envelope me-2"></i> メッセージ</a></li>
-            <li class="nav-item"><a href="user/profile" class="nav-link"><i class="fas fa-user me-2"></i> プロフィール</a></li>
+            <li class="nav-item"><a href="/user/profile" class="nav-link"><i class="fas fa-user me-2"></i> プロフィール</a></li>
             <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-edit me-2"></i> 作成</a></li>
             <li class="nav-item"><a href="/logout" class="nav-link"><i class="fas fa-sign-out-alt me-2"></i> ログアウト</a></li>
         </ul>
@@ -26,7 +26,7 @@
                 <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-home me-2"></i> ホーム</a></li>
                 <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-bell me-2"></i> 通知</a></li>
                 <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-envelope me-2"></i> メッセージ</a></li>
-                <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-user me-2"></i> プロフィール</a></li>
+                <li class="nav-item"><a href="/user/profile" class="nav-link"><i class="fas fa-user me-2"></i> プロフィール</a></li>
                 <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-edit me-2"></i> 作成</a></li>
                 <li class="nav-item"><a href="/logout" class="nav-link"><i class="fas fa-sign-out-alt me-2"></i> ログアウト</a></li>
             </ul>
