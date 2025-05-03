@@ -7,7 +7,7 @@
     position: fixed;
     top: 0;
     left: 0;
-    background-color: #343a40;
+    background-color: #122F4D;
     padding-top: 20px;
 }
 
@@ -19,7 +19,7 @@
 
 .sidebar .nav-link:hover,
 .offcanvas .nav-link:hover {
-    background-color: #495057;
+    background-color: #0B1C35;
 }
 
 .menu-button {
