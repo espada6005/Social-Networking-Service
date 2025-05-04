@@ -133,7 +133,7 @@ return [
     })->setMiddleware(["guest"]),
     // メール送信後
     "verify/resend" => Route::create("verify/resend", function (): HTTPRenderer {
-        return new HTMLRenderer("pages/verify-resend", []);
+        return new HTMLRenderer("pages/verify_resend", []);
     })->setMiddleware(["auth"]),
     // メール認証
     "verify/email" => Route::create("verify/email", function (): HTTPRenderer {
@@ -160,15 +160,19 @@ return [
 
             FlashData::setFlashData("success", "メール認証が完了しました");
 
-            return new RedirectRenderer("user");
+            return new RedirectRenderer("profile");
         } catch (\Exception $e) {
             error_log($e->getMessage());
             FlashData::setFlashData("error", "メール認証に失敗しました");
             return new RedirectRenderer("verify/resend");
         }
     })->setMiddleware(["auth", "signature"]),
+    // タイムライン
     "timeline" => Route::create("timeline", function (): HTTPRenderer {
         return new HTMLRenderer("pages/timeline", []);
     })->setMiddleware(["auth", "verify"]),
-
+    // ユーザープロフィール
+    "profile" => Route::create("profile", function (): HTTPRenderer {
+        return new HTMLRenderer("pages/profile", []);
+    })->setMiddleware(["auth", "verify"]),
 ];
