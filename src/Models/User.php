@@ -16,7 +16,7 @@ class User implements Model {
         private string $username,
         private string $email,
         private string $type = "user",
-        private ?int $id = null,
+        private ?int $user_id = null,
         private ?string $profile_text = null,
         private ?string $profile_image_hash = null,
         private ?string $email_confirmed_at = null,
@@ -24,12 +24,12 @@ class User implements Model {
         private ?string $updated_at = null
     ) {}
     
-    public function getId(): ?int {
-        return $this->id;
+    public function getUserId(): ?int {
+        return $this->user_id;
     }
 
-    public function setId(int $user_id): void {
-        $this->id = $user_id;
+    public function setUserId(int $user_id): void {
+        $this->user_id = $user_id;
     }
 
     public function getName(): string {
