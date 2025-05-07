@@ -9,15 +9,15 @@ use Models\User;
 class UserDAOImpl implements UserDAO {
 
     public function create(User $user, string $password): bool {
-        if ($user->getId() !== null) {
-            throw new \Exception("Cannot create a computer part with as existing ID. id: {$user->getId()}");
+        if ($user->getUserId() !== null) {
+            throw new \Exception("Cannot create a computer part with as existing ID. id: {$user->getUserId()}");
         }
 
         $mysqli = DatabaseManager::getMysqliConnection();
 
         $query = <<<QUERY
             INSERT INTO users (
-                name, 
+                name,
                 username, 
                 email, 
                 password
@@ -45,7 +45,7 @@ class UserDAOImpl implements UserDAO {
             return false;
         }
 
-        $user->setId($mysqli->insert_id);
+        $user->setUserId($mysqli->insert_id);
 
         return true;
     }
@@ -95,14 +95,14 @@ class UserDAOImpl implements UserDAO {
     }
 
     public function update(User $user): bool {
-        if ($user->getId() === null) {
+        if ($user->getUserId() === null) {
             throw new \Exception("User specified has no ID");
         }
 
-        $current = $this->getById($user->getId());
+        $current = $this->getById($user->getUserId());
 
         if ($current === null) {
-            throw new \Exception("User {$user->getId()} does not exist.");
+            throw new \Exception("User {$user->getUserId()} does not exist.");
         }
 
         $mysqli = DatabaseManager::getMysqliConnection();
@@ -116,7 +116,7 @@ class UserDAOImpl implements UserDAO {
                 profile_text = ?, 
                 profile_image_hash = ?
             WHERE 
-                id = ?;
+                user_id = ?;
         QUERY;
 
         $result = $mysqli->prepareAndExecute(
@@ -127,7 +127,7 @@ class UserDAOImpl implements UserDAO {
                 $user->getUsername(),
                 $user->getProfileText(),
                 $user->getProfileImageHash(),
-                $user->getId(),
+                $user->getUserId(),
             ],
         );
 
@@ -147,7 +147,7 @@ class UserDAOImpl implements UserDAO {
             SET 
                 email_confirmed_at = NOW()
             WHERE 
-                id = ?;
+                user_id = ?;
         QUERY;
 
         $result = $mysqwli->prepareAndExecute($query, "i", [$id]);
@@ -164,7 +164,7 @@ class UserDAOImpl implements UserDAO {
             SET 
                 password = ?
             WHERE 
-                id = ?;
+                user_id = ?;
         QUERY;
 
         $result = $mysqli->prepareAndExecute($query,"si", [
@@ -182,7 +182,7 @@ class UserDAOImpl implements UserDAO {
             DELETE FROM
                 users
             WHERE 
-                id = ?;
+                user_id = ?;
         QUERY;
 
         $result = $mysqli->prepareAndExecute($query, 'i', [$id]);
@@ -194,7 +194,7 @@ class UserDAOImpl implements UserDAO {
 
         $query = <<<QUERY
             SELECT 
-                id, 
+                user_id, 
                 name, 
                 username, 
                 email, 
@@ -208,7 +208,7 @@ class UserDAOImpl implements UserDAO {
             FROM 
                 users
             WHERE
-                id = ?;
+                user_id = ?;
         QUERY;
 
         $result = $mysqli->prepareAndFetchAll($query, "i", [$id])[0] ?? null;
@@ -225,7 +225,7 @@ class UserDAOImpl implements UserDAO {
 
         $query = <<<QUERY
             SELECT 
-                id, 
+                user_id, 
                 name, 
                 username, 
                 email, 
@@ -256,7 +256,7 @@ class UserDAOImpl implements UserDAO {
 
         $query = <<<QUERY
             SELECT 
-                id, 
+                user_id, 
                 name, 
                 username, 
                 email, 
@@ -287,7 +287,7 @@ class UserDAOImpl implements UserDAO {
 
         $query = <<<QUERY
             SELECT 
-                id, 
+                user_id, 
                 name, 
                 username, 
                 email, 
@@ -315,7 +315,7 @@ class UserDAOImpl implements UserDAO {
 
     private function rawDataToUser(array $rawData): User {
         return new User(
-            id: $rawData["id"],
+            user_id: $rawData["user_id"],
             name: $rawData["name"],
             username: $rawData["username"],
             email: $rawData["email"],
