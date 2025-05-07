@@ -14,7 +14,7 @@ class Authenticate {
     private const USER_ID_SESSION_WKY = "user_id";
     
     public static function loginAsUser(User $user): bool {
-        if ($user->getId() === null) {
+        if ($user->getUserId() === null) {
             throw new \Exception("Cannot login a user with no ID.");
         }
 
@@ -22,7 +22,7 @@ class Authenticate {
             throw new \Exception("User is already logged in. Logout before continuing");
         }
 
-        $_SESSION[self::USER_ID_SESSION_WKY] = $user->getId();
+        $_SESSION[self::USER_ID_SESSION_WKY] = $user->getUserId();
         return true;
     }
 
@@ -54,7 +54,7 @@ class Authenticate {
             throw new Exception("Could not retrieve user by specified email %s " . $email);
         }
 
-        $hashedPassword = $userDAO->getHashedPasswordById(self::$authenticatedUser->getId());
+        $hashedPassword = $userDAO->getHashedPasswordById(self::$authenticatedUser->getUserId());
 
         if (password_verify($password, $hashedPassword)) {
             self::loginAsUser(self::$authenticatedUser);
