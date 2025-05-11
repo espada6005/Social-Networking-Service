@@ -10,7 +10,7 @@ class UserDAOImpl implements UserDAO {
 
     public function create(User $user, string $password): bool {
         if ($user->getUserId() !== null) {
-            throw new \Exception("Cannot create a computer part with as existing ID. id: {$user->getUserId()}");
+            throw new \Exception("Cannot create a computer part with as existing ID. user_id: {$user->getUserId()}");
         }
 
         $mysqli = DatabaseManager::getMysqliConnection();
@@ -50,8 +50,8 @@ class UserDAOImpl implements UserDAO {
         return true;
     }
 
-    public function getById(int $id): ?User {
-        $userRaw = $this->getRawById($id);
+    public function getById(int $user_id): ?User {
+        $userRaw = $this->getRawById($user_id);
 
         if ($userRaw === null) {
             return null;
@@ -90,8 +90,8 @@ class UserDAOImpl implements UserDAO {
         return $this->rawDataToUser($userRaw);
     }
 
-    public function getHashedPasswordById(int $id): ?string {
-        return $this->getRawById($id)["password"] ?? null;
+    public function getHashedPasswordById(int $user_id): ?string {
+        return $this->getRawById($user_id)["password"] ?? null;
     }
 
     public function update(User $user): bool {
@@ -138,7 +138,7 @@ class UserDAOImpl implements UserDAO {
         return true;
     }
 
-    public function updateEmailConfirmedAt(int $id): bool {
+    public function updateEmailConfirmedAt(int $user_id): bool {
         $mysqwli = DatabaseManager::getMysqliConnection();
 
         $query = <<<QUERY
@@ -150,12 +150,12 @@ class UserDAOImpl implements UserDAO {
                 user_id = ?;
         QUERY;
 
-        $result = $mysqwli->prepareAndExecute($query, "i", [$id]);
+        $result = $mysqwli->prepareAndExecute($query, "i", [$user_id]);
 
         return $result;
     }
 
-    public function updatePassword(int $id, string $password): bool {
+    public function updatePassword(int $user_id, string $password): bool {
         $mysqli = DatabaseManager::getMysqliConnection();
 
         $query = <<<QUERY
@@ -169,13 +169,13 @@ class UserDAOImpl implements UserDAO {
 
         $result = $mysqli->prepareAndExecute($query,"si", [
             password_hash($password, PASSWORD_DEFAULT),
-            $id,
+            $user_id,
         ]);
 
         return $result;
     }
 
-    public function delete(int $id): bool {
+    public function delete(int $user_id): bool {
         $mysqli = DatabaseManager::getMysqliConnection();
 
         $query = <<<QUERY
@@ -185,11 +185,11 @@ class UserDAOImpl implements UserDAO {
                 user_id = ?;
         QUERY;
 
-        $result = $mysqli->prepareAndExecute($query, 'i', [$id]);
+        $result = $mysqli->prepareAndExecute($query, 'i', [$user_id]);
         return $result;
     }
 
-    private function getRawById(int $id): ?array {
+    private function getRawById(int $user_id): ?array {
         $mysqli = DatabaseManager::getMysqliConnection();
 
         $query = <<<QUERY
@@ -211,7 +211,7 @@ class UserDAOImpl implements UserDAO {
                 user_id = ?;
         QUERY;
 
-        $result = $mysqli->prepareAndFetchAll($query, "i", [$id])[0] ?? null;
+        $result = $mysqli->prepareAndFetchAll($query, "i", [$user_id])[0] ?? null;
 
         if ($result === null) {
             return null;
