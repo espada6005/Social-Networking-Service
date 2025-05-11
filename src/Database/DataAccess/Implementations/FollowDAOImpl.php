@@ -8,7 +8,7 @@ use Models\Follow;
 
 class FollowDAOImpl implements FollowDAO {
 
-    public function createFollow(Follow $follow): bool {
+    public function create(Follow $follow): bool {
         if ($follow->getFollowId() !== null) {
             throw new \InvalidArgumentException("すでにフォロー済みです");
         }
@@ -185,7 +185,7 @@ class FollowDAOImpl implements FollowDAO {
         return $result !== null && count($result) > 0;
     }
 
-    public function deletefollow(int $user_id, int $followee_id): bool {
+    public function delete(int $user_id, int $followee_id): bool {
         $mysqli = DatabaseManager::getMysqliConnection();
 
         $query = <<<QUERY
