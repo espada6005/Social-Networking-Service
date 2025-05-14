@@ -15,6 +15,8 @@ use Response\Render\RedirectRenderer;
 use Routing\Route;
 use Types\ValueType;
 
+require_once("../src/Constants/file_constants.php");
+
 return [
     // トップページ
     "" => Route::create("", function (): HTTPRenderer {
@@ -110,7 +112,7 @@ return [
             // メール認証用のURLを生成
             $lats = 1800;
             $params = [
-                "id" => hash_hmac("sha256", $user->getId(), Settings::env("SECRET_KEY")),
+                "id" => hash_hmac("sha256", $user->getUserId(), Settings::env("SECRET_KEY")),
                 "user" => hash_hmac("sha256", $user->getEmail(), Settings::env("SECRET_KEY")),
                 "expiration" => time() + $lats,
             ];
@@ -141,7 +143,7 @@ return [
             // ログイン済みユーザーを取得
             $authenticatedUser = Authenticate::getAuthenticatedUser();
 
-            $hashedUserId = hash_hmac("sha256", $authenticatedUser->getId(), Settings::env("SECRET_KEY"));
+            $hashedUserId = hash_hmac("sha256", $authenticatedUser->getUserId(), Settings::env("SECRET_KEY"));
             $hashedEmail = hash_hmac("sha256", $authenticatedUser->getEmail(), Settings::env("SECRET_KEY"));
 
             $expectedHashedId = $_GET["id"];
@@ -152,7 +154,7 @@ return [
             }
 
             $userDao = DAOFactory::getUserDAO();
-            $result = $userDao->updateEmailConfirmedAt($authenticatedUser->getId());
+            $result = $userDao->updateEmailConfirmedAt($authenticatedUser->getUserId());
 
             if (!$result) {
                 throw new Exception("メール認証に失敗しました");
@@ -175,4 +177,49 @@ return [
     "profile" => Route::create("profile", function (): HTTPRenderer {
         return new HTMLRenderer("pages/profile", []);
     })->setMiddleware(["auth", "verify"]),
+    // プロフィール情報取得
+    "profile/init" => Route::create("profile/init", function (): HTTPRenderer {
+        try {
+            if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+                throw new Exception("Invalid request method");
+            }
+
+            $username = $_POST["user"];
+
+            if ($username === "") {
+                $user = Authenticate::getAuthenticatedUser();
+            } else {
+                $userDao = DAOFactory::getUserDAO();
+                $user = $userDao->getByUsername($username);
+            }
+
+            if ($user === null) {
+                return new JSONRenderer(["user" => null]);
+            }
+
+            $followDao = DAOFactory::getFollowDAO();
+            $authenticatedUser = Authenticate::getAuthenticatedUser();
+
+            return new JSONRenderer([
+                "status" => "success",
+                "user" => [
+                    "isLoggedInUser" => intval($user->getUsername() === $authenticatedUser->getUsername()),
+                    "isFollowee" => intval($followDao->isFollowee($authenticatedUser->getUserId(), $user->getUserId())),
+                    "isFollower" => intval($followDao->isFollower($authenticatedUser->getUserId(), $user->getUserId())),
+                    "name" => $user->getName(),
+                    "username" => $user->getUsername(),
+                    "profileText" => $user->getProfileText(),
+                    "profileImagePath" => $user->getProfileImageHash() ?
+                        PROFILE_IMAGE_FILE_DIR . $user->getProfileImageHash() :
+                        PROFILE_IMAGE_FILE_DIR . "default_profile_image.png",
+                    "userType" => $user->getType(),
+                    "followeeCount" => $followDao->getFolloweeCount($user->getUserId()),
+                    "followerCount" => $followDao->getFollowerCount($user->getUserId()),
+                ],
+            ]);
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            return new JSONRenderer(["status" => "error", "message" => $e->getMessage()]);
+        }
+    })->setMiddleware(["auth", "verify"]),  
 ];
