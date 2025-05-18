@@ -213,6 +213,7 @@ return [
                         PROFILE_IMAGE_FILE_DIR . $user->getProfileImageHash() :
                         PROFILE_IMAGE_FILE_DIR . "default_profile_image.png",
                     "userType" => $user->getType(),
+                    "profileImageType" => $user->getProfileImageHash() === null ? "default" : "custom",
                     "followeeCount" => $followDao->getFolloweeCount($user->getUserId()),
                     "followerCount" => $followDao->getFollowerCount($user->getUserId()),
                 ],
@@ -221,5 +222,5 @@ return [
             error_log($e->getMessage());
             return new JSONRenderer(["status" => "error", "message" => $e->getMessage()]);
         }
-    })->setMiddleware(["auth", "verify"]),  
+    })->setMiddleware(["auth", "verify"]),
 ];
