@@ -3,10 +3,12 @@
 body {
     height: 100vh;
     background: linear-gradient(45deg, #3191f0, #a99ffe);
+    overflow: hidden;
 }
 
 header {
     color: #fff;
+    margin-top: 10px;
 }
 
 p {
