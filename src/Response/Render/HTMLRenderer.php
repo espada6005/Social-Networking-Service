@@ -45,6 +45,7 @@ class HTMLRenderer implements HTTPRenderer {
 
     private function getFooter(): string {
         ob_start();
+        $user = Authenticate::getAuthenticatedUser();
         require $this->getViewPath("layout/footer");
         return ob_get_clean();
     }
