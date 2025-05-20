@@ -50,5 +50,5 @@
     </div>
     <div id="main-content" class="col bg-light text-dark" style="max-height: 100vh; overflow-y: hidden;">
     <!-- 下のコメントアウト部分を各ページファイルで作成する -->
-    <!-- Content area...
+    <!-- Content area... -->
 <?php endif; ?>
