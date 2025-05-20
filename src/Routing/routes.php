@@ -37,7 +37,6 @@ return [
             Authenticate::loginAsUser($guestUser);
 
             return new JSONRenderer(["status" => "success", "redirectUrl" => "timeline"]);
-
         } catch (\Exception $e) {
             return new JSONRenderer(["status" => "error", "message" => $e->getMessage()]);
         }
@@ -156,6 +155,39 @@ return [
     // メール送信後
     "verify/resend" => Route::create("verify/resend", function (): HTTPRenderer {
         return new HTMLRenderer("pages/verify_resend", []);
+    })->setMiddleware(["auth"]),
+    // メール認証再送信
+    "form/verify/resend" => Route::create("form/verify/resend", function (): HTTPRenderer {
+        try {
+            if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+                throw new Exception("Invalid request method");
+            }
+
+            $user = Authenticate::getAuthenticatedUser();
+            $lats = 1800;
+            $params = [
+                "id" => hash_hmac("sha256", $user->getUserId(), Settings::env("SECRET_KEY")),
+                "user" => hash_hmac("sha256", $user->getEmail(), Settings::env("SECRET_KEY")),
+                "expiration" => time() + $lats,
+            ];
+            $signedUrl = Route::create("verify/email", function () {})->getSignedURL($params);
+
+            $sendResulet = MailSender::sendVerificationEmail(
+                $signedUrl,
+                $user->getEmail(),
+                $user->getName()
+            );
+
+            if (!$sendResulet) {
+                throw new Exception("メールの送信に失敗しました");
+            }
+            FlashData::setFlashData("success", "メール認証用のメールを再送信しました");
+            return new JSONRenderer(["status" => "success", "redirectUrl" => "/verify/resend"]);
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            FlashData::setFlashData("error", "メール認証用のメールの再送信に失敗しました");
+            return new JSONRenderer(["status" => "error", "redirectUrl" => "/verify/resend"]);
+        }
     })->setMiddleware(["auth"]),
     // メール認証
     "verify/email" => Route::create("verify/email", function (): HTTPRenderer {
