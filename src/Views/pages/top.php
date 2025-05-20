@@ -16,25 +16,25 @@
         </div>
         <div class="tab-content card-body">
             <!-- ログインフォーム -->
-                <div class="tab-pane fade show active" id="login" role="tabpanel" aria-labelledby="login-tab">
-                    <form action="post" id="login-form">
-                        <input type="hidden" name="csrf_token" value="<?= Helpers\CrossSiteForgeryProtection::getToken(); ?>">
-                        <div class="mb-3">
-                            <label for="login-email" class="form-label">メールアドレス</label>
-                            <input type="text" class="form-control" id="login-email" name="email">
-                        </div>
-                        <div class="mb-3">
-                            <label for="login-password" class="form-label">パスワード</label>
-                            <input type="password" class="form-control" id="login-password" name="password">
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100" id="login-btn">ログイン</button>
-                        <div class="text-center mt-2">
-                            <a href="#forgot">パスワードを忘れた方はこちら</a>
-                        </div>
-                        <hr>
-                        <button type="button" class="btn btn-secondary w-100 mt-3">ゲストログイン</button>
-                    </form>
-                </div>
+            <div class="tab-pane fade show active" id="login" role="tabpanel" aria-labelledby="login-tab">
+                <form action="post" id="login-form">
+                    <input type="hidden" name="csrf_token" value="<?= Helpers\CrossSiteForgeryProtection::getToken(); ?>">
+                    <div class="mb-3">
+                        <label for="login-email" class="form-label">メールアドレス</label>
+                        <input type="text" class="form-control" id="login-email" name="email">
+                    </div>
+                    <div class="mb-3">
+                        <label for="login-password" class="form-label">パスワード</label>
+                        <input type="password" class="form-control" id="login-password" name="password">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100" id="login-btn">ログイン</button>
+                    <div class="text-center mt-2">
+                        <a href="#forgot">パスワードを忘れた方はこちら</a>
+                    </div>
+                </form>
+                <hr>
+                <a id="guest-login" class="btn btn-secondary w-100 mt-3">ゲストログイン</a>
+            </div>
             <!-- 新規登録フォーム -->
             <div class="tab-pane fade" id="register" role="tabpanel" aria-labelledby="register-tab">
                 <form action="post" id="register-form">
@@ -58,7 +58,7 @@
                     <div class="mb-3">
                         <label for="register-confirm-password" class="form-label">パスワード確認用</label>
                         <input type="password" class="form-control" id="register-confirm-password" name="confirm_password">
-                    </div>  
+                    </div>
                     <button type="submit" class="btn btn-primary w-100" id="register-btn">登録</button>
                 </form>
             </div>
@@ -67,4 +67,5 @@
 </div>
 <script src="js/common.js"></script>
 <script src="js/login.js"></script>
+<script src="js/guest-login.js"></script>
 <script src="js/register.js"></script>
