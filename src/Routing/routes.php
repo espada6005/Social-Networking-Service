@@ -22,6 +22,26 @@ return [
     "" => Route::create("", function (): HTTPRenderer {
         return new HTMLRenderer("pages/top", []);
     })->setMiddleware(["guest"]),
+    // ゲストログイン
+    "guest/login" => Route::create("guest/login", function (): HTTPRenderer {
+        try {
+            $userDao = DAOFactory::getUserDAO();
+
+            // ゲストユーザーを取得
+            $guestUser = $userDao->getGuestUser();
+
+            if (!$guestUser === null) {
+                throw new Exception("ゲストユーザーが取得できませんでした");
+            }
+            // ゲストユーザーとしてログイン
+            Authenticate::loginAsUser($guestUser);
+
+            return new JSONRenderer(["status" => "success", "redirectUrl" => "timeline"]);
+
+        } catch (\Exception $e) {
+            return new JSONRenderer(["status" => "error", "message" => $e->getMessage()]);
+        }
+    })->setMiddleware(["guest"]),
     // ログイン
     "form/login" => Route::create("form/login", function (): HTTPRenderer {
         try {
