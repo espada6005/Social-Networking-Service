@@ -29,7 +29,7 @@
                     </div>
                     <button type="submit" class="btn btn-primary w-100" id="login-btn">ログイン</button>
                     <div class="text-center mt-2">
-                        <a href="#forgot">パスワードを忘れた方はこちら</a>
+                        <a href="/password/forgot">パスワードを忘れた方はこちら</a>
                     </div>
                 </form>
                 <hr>
