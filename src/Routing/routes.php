@@ -122,7 +122,7 @@ return [
             $success = $userDao->create($user, $_POST["password"]);
 
             if (!$success) {
-                throw new Exception("登録に失敗しました");
+                return new JSONRenderer(["status" => "error", "message" => "ユーザー登録に失敗しました"]);
             }
 
             // ログイン
@@ -144,12 +144,13 @@ return [
             );
 
             if (!$sendResulet) {
-                throw new Exception("メールの送信に失敗しました");
+                return new JSONRenderer(["status" => "error", "message" => "メールの送信に失敗しました"]);
             }
 
             return new JSONRenderer(["status" => "success", "redirectUrl" => "/verify/resend"]);
         } catch (\Exception $e) {
-            return new JSONRenderer(["status" => "error", "message" => $e->getMessage()]);
+            error_log($e->getMessage());
+            return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました"]);
         }
     })->setMiddleware(["guest"]),
     // メール送信後
@@ -172,21 +173,20 @@ return [
             ];
             $signedUrl = Route::create("verify/email", function () {})->getSignedURL($params);
 
-            $sendResulet = MailSender::sendVerificationEmail(
+            $result = MailSender::sendVerificationEmail(
                 $signedUrl,
                 $user->getEmail(),
                 $user->getName()
             );
 
-            if (!$sendResulet) {
-                throw new Exception("メールの送信に失敗しました");
+            if (!$result) {
+                return new JSONRenderer(["status" => "error", "message" => "メールの送信に失敗しました"]);
             }
-            FlashData::setFlashData("success", "メール認証用のメールを再送信しました");
+
             return new JSONRenderer(["status" => "success", "redirectUrl" => "/verify/resend"]);
         } catch (\Exception $e) {
             error_log($e->getMessage());
-            FlashData::setFlashData("error", "メール認証用のメールの再送信に失敗しました");
-            return new JSONRenderer(["status" => "error", "redirectUrl" => "/verify/resend"]);
+            return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました"]);
         }
     })->setMiddleware(["auth"]),
     // メール認証
