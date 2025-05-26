@@ -221,6 +221,10 @@ return [
             return new RedirectRenderer("verify/resend");
         }
     })->setMiddleware(["auth", "signature"]),
+    // パスワード忘れ
+    "password/forgot" => Route::create("password/forgot", function (): HTTPRenderer {
+        return new HTMLRenderer("pages/password_forgot", []);
+    })->setMiddleware(["guest"]),
     // タイムライン
     "timeline" => Route::create("timeline", function (): HTTPRenderer {
         return new HTMLRenderer("pages/timeline", []);
