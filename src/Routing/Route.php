@@ -44,6 +44,25 @@ class Route {
         return $this->path;
     }
 
+    public function getSignature(string $url): string {
+        $parsedUrl = parse_url($url);
+        if (!isset($parsedUrl['query'])) {
+            throw new \InvalidArgumentException("無効な署名付きURLです");
+        }
+
+        $queryParams = [];
+
+        parse_str($parsedUrl['query'], $queryParams);
+
+        if (!isset($queryParams['signature'])) {
+            throw new \InvalidArgumentException("無効な署名付きURLです");
+        }
+
+        $signature = $queryParams['signature'];
+
+        return $signature;
+    }
+
     public function getSignedURL(array $queryParameters): string {
         $url = $this->getBaseURL();
 
