@@ -6,6 +6,7 @@ use Helpers\Authenticate;
 use Helpers\MailSender;
 use Helpers\Settings;
 use Helpers\ValidationHelper;
+use Models\PasswordResetToken;
 use Models\User;
 use Response\FlashData;
 use Response\HTTPRenderer;
@@ -224,6 +225,66 @@ return [
     // パスワード忘れ
     "password/forgot" => Route::create("password/forgot", function (): HTTPRenderer {
         return new HTMLRenderer("pages/password_forgot", []);
+    })->setMiddleware(["guest"]),
+       // パスワードリセットメール送信
+    "form/password/forgot" => Route::create("form/password/forgot", function (): HTTPRenderer {
+        try {
+            if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+                throw new Exception("Invalid request method");
+            }
+
+            // 入力値検証
+            $fieldErrors = ValidationHelper::validateFields([
+                "email" => ValueType::EMAIL,
+            ], $_POST);
+
+            if (!empty($fieldErrors)) {
+                return new JSONRenderer(["status" => "fieldErrors", "message" => $fieldErrors]);
+            }
+
+            $userDao = DAOFactory::getUserDAO();
+            $user = $userDao->getByEmail($_POST["email"]);
+
+            if ($user === null) {
+                $fieldErrors["email"] = "メールアドレスが見つかりません";
+                return new JSONRenderer(["status" => "fieldErrors", "message" => $fieldErrors]);
+            }
+
+            // パスワードリセット用のURLを生成
+            $lats = 1800;
+            $params = [
+                "expiration" => time() + $lats,
+            ];
+
+            $route = Route::create("password/reset", function () {});
+            $signedUrl = $route->getSignedURL($params);
+
+            // メール送信
+            $result = MailSender::sendPasswordResetEmail($signedUrl, $user->getEmail(), $user->getName());
+
+            if (!$result) {
+                return new JSONRenderer(["status" => "error", "message" => "メールの送信に失敗しました"]);
+            }
+
+            $signature = $route->getSignature($signedUrl);
+
+            $passwordResetToken = new PasswordResetToken(
+                user_id: $user->getUserId(),
+                token: pack("H*", $signature)
+            );
+
+            $passwordResetDao = DAOFactory::getPasswordResetDAO();
+            $success = $passwordResetDao->create($passwordResetToken);
+
+            if (!$success) {
+                return new JSONRenderer(["status" => "error", "message" => "パスワードリセットトークンの保存に失敗しました"]);
+            }
+
+            return new JSONRenderer(["status" => "success", "message" => "パスワードリセット用のメールを送信しました"]);
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました"]);
+        }
     })->setMiddleware(["guest"]),
     // タイムライン
     "timeline" => Route::create("timeline", function (): HTTPRenderer {
