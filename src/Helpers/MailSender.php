@@ -72,6 +72,10 @@ class MailSender {
 
             // 受信者を設定
             $mail->addAddress($toAddress, $toName);
+        
+            $mail->Subject = "パスワードリセット";
+
+            $mail->isHTML(true);
 
             ob_start();
             extract([
