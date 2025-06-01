@@ -286,6 +286,22 @@ return [
             return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました"]);
         }
     })->setMiddleware(["guest"]),
+    // パスワードリセットページ
+    "password/reset" => Route::create("password/reset", function (): HTTPRenderer {
+        try {
+            $passwordResetDao = DAOFactory::getPasswordResetDAO();
+            $passwordResetToken = $passwordResetDao->getByToken(pack("H*", $_GET["signature"]));
+
+            if ($passwordResetToken === null) {
+                return new RedirectRenderer("password/forgot");
+            }
+
+            return new HTMLRenderer("pages/password_reset", ["userId" => $passwordResetToken->getUserId()]);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            return new RedirectRenderer("password/forgot");
+        }
+    })->setMiddleware(["guest", "signature"]),
     // タイムライン
     "timeline" => Route::create("timeline", function (): HTTPRenderer {
         return new HTMLRenderer("pages/timeline", []);
