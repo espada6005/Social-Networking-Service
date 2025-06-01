@@ -116,7 +116,7 @@ class PasswordResetTokenDAOImpl implements PasswordResetTokenDAO {
         return new PasswordResetToken(
             user_id: $rawData['user_id'],
             token: unpack('H*', $rawData['token'])[1],
-            token_id: $rawData['id'],
+            token_id: $rawData['token_id'],
             created_at: $rawData['created_at']
         );
     }
