@@ -21,7 +21,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="confirm-password" class="form-label">パスワード（確認）</label>
-                        <input type="password" class="form-control" id="confirm-password" name="confirm-password" required>
+                        <input type="password" class="form-control" id="confirm-password" name="confirm_password" required>
                         <div id="confirm-password-error-msg" class="invalid-feedback"></div>
                     </div>
                     <div class="text-center mt-5">
