@@ -81,18 +81,16 @@ return [
                 throw new Exception("Invalid request method");
             }
 
-            $requiredFields = [
+            $userDao = DAOFactory::getUserDAO();
+
+            // 入力値検証
+            $fieldErrors = ValidationHelper::validateFields([
                 "name" => ValueType::STRING,
                 "username" => ValueType::STRING,
                 "email" => ValueType::EMAIL,
                 "password" => ValueType::PASSWORD,
                 "confirm_password" => ValueType::PASSWORD,
-            ];
-
-            $userDao = DAOFactory::getUserDAO();
-
-            // 入力値検証
-            $fieldErrors = ValidationHelper::validateFields($requiredFields, $_POST);
+            ], $_POST);
 
             if ($userDao->getByEmail($_POST["email"])) {
                 $fieldErrors["email"] = "メールアドレスは既に使われています";
@@ -226,7 +224,7 @@ return [
     "password/forgot" => Route::create("password/forgot", function (): HTTPRenderer {
         return new HTMLRenderer("pages/password_forgot", []);
     })->setMiddleware(["guest"]),
-       // パスワードリセットメール送信
+    // パスワードリセットメール送信
     "form/password/forgot" => Route::create("form/password/forgot", function (): HTTPRenderer {
         try {
             if ($_SERVER["REQUEST_METHOD"] !== "POST") {
@@ -302,6 +300,54 @@ return [
             return new RedirectRenderer("password/forgot");
         }
     })->setMiddleware(["guest", "signature"]),
+    // パスワードリセット
+    "form/password/reset" => Route::create("form/password/reset", function (): HTTPRenderer {
+        try {
+            if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+                throw new Exception("Invalid request method");
+            }
+
+            // 入力値検証
+            $fieldErrors = ValidationHelper::validateFields([
+                "password" => ValueType::PASSWORD,
+                "confirm_password" => ValueType::PASSWORD,
+            ], $_POST);
+
+            if (!array_key_exists("password", $fieldErrors) && !array_key_exists("confirm_password", $fieldErrors) &&
+                $_POST["password"] !== $_POST["confirm_password"]) {
+                $fieldErrors["password"] = "パスワードが一致しません";
+                $fieldErrors["confirm_password"] = "パスワードが一致しません";
+            }
+
+            if (!empty($fieldErrors)) {
+                return new JSONRenderer(["status" => "fieldErrors", "message" => $fieldErrors]);
+            }
+
+            // ユーザーを取得
+            $userDao = DAOFactory::getUserDAO();
+            $user = $userDao->getById($_POST["user_id"]);
+
+            if ($user === null) {
+                return new JSONRenderer(["status" => "error", "message" => "ユーザーが見つかりません"]);
+            }
+
+            // パスワードを更新
+            $success = $userDao->updatePassword($user->getUserId(), $_POST["password"]);
+
+            if (!$success) {
+                return new JSONRenderer(["status" => "error", "message" => "パスワードの更新に失敗しました"]);
+            }
+
+            // パスワードリセットトークンを削除
+            $passwordResetDao = DAOFactory::getPasswordResetDAO();
+            $passwordResetDao->deleteByUserId($_POST["user_id"]);
+
+            return new JSONRenderer(["status" => "success", "redirectUrl" => "/"]);
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました"]);
+        }
+    })->setMiddleware(["guest"]),
     // タイムライン
     "timeline" => Route::create("timeline", function (): HTTPRenderer {
         return new HTMLRenderer("pages/timeline", []);
