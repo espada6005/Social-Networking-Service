@@ -83,4 +83,13 @@ class ValidationHelper {
         return $value;
     }
 
+    public static function validateImageType(string $type): bool {
+        $allowedTypes = ["image/png", "image/jpeg", "image/gif"];
+        return in_array($type, $allowedTypes);
+    }
+
+    public static function validateImageSize(int $size, int $min = 1, int $max = 1048576): bool {
+        return $size >= $min && $size <= $max;
+    }
+
 }
