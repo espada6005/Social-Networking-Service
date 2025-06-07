@@ -165,6 +165,40 @@ return [
             return new RedirectRenderer("timeline");
         }
     })->setMiddleware(["auth", "verify"]),
+    // ユーザー削除
+    "form/user/delete" => Route::create("form/user/delete", function (): HTTPRenderer {
+        try {
+            if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+                throw new Exception("Invalid request method");
+            }
+
+            // 認証済みユーザーを取得
+            $user = Authenticate::getAuthenticatedUser();
+            if ($user->getUserId() != $_POST["user_id"]) {
+                return new JSONRenderer(["status" => "error", "message" => "不正なユーザー削除リクエストです"]);
+            }
+
+            $userDao = DAOFactory::getUserDAO();
+            // プロフィール画像があれば削除
+            if ($user->getProfileImageHash() !== null) {
+                ImageHelper::deleteProfileImage($user->getProfileImageHash());
+            }
+            // ユーザーを削除
+            $success = $userDao->delete($user->getUserId());
+            
+            if (!$success) {
+                return new JSONRenderer(["status" => "error", "message" => "ユーザー削除に失敗しました"]);
+            }
+
+            // ログアウト
+            Authenticate::logoutUser();
+
+            return new JSONRenderer(["status" => "success", "redirectUrl" => "/"]);
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました"]);
+        }
+    })->setMiddleware(["auth", "verify"]),
     // 認証メール送信後
     "verify/resend" => Route::create("verify/resend", function (): HTTPRenderer {
         return new HTMLRenderer("pages/verify_resend", []);
