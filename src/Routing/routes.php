@@ -153,6 +153,18 @@ return [
             return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました"]);
         }
     })->setMiddleware(["guest"]),
+    // ユーザー削除確認
+    "user/delete" => Route::create("user/delete", function (): HTTPRenderer {
+        try {
+            // 認証済みユーザーを取得
+            $user = Authenticate::getAuthenticatedUser();
+
+            return new HTMLRenderer("pages/user_delete", ["userId" => $user->getUserId()]);
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            return new RedirectRenderer("timeline");
+        }
+    })->setMiddleware(["auth", "verify"]),
     // 認証メール送信後
     "verify/resend" => Route::create("verify/resend", function (): HTTPRenderer {
         return new HTMLRenderer("pages/verify_resend", []);
@@ -285,7 +297,7 @@ return [
             return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました"]);
         }
     })->setMiddleware(["guest"]),
-    // パスワードリセットページ
+    // パスワードリセット
     "password/reset" => Route::create("password/reset", function (): HTTPRenderer {
         try {
             $passwordResetDao = DAOFactory::getPasswordResetDAO();
@@ -301,7 +313,7 @@ return [
             return new RedirectRenderer("password/forgot");
         }
     })->setMiddleware(["guest", "signature"]),
-    // パスワードリセット
+    // パスワード更新
     "form/password/reset" => Route::create("form/password/reset", function (): HTTPRenderer {
         try {
             if ($_SERVER["REQUEST_METHOD"] !== "POST") {
