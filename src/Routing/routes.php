@@ -3,6 +3,7 @@
 use Database\DataAccess\DAOFactory;
 use Exceptions\AuthenticationFailureException;
 use Helpers\Authenticate;
+use Helpers\ImageHelper;
 use Helpers\MailSender;
 use Helpers\Settings;
 use Helpers\ValidationHelper;
@@ -75,7 +76,7 @@ return [
         return new RedirectRenderer("");
     })->setMiddleware(["auth"]),
     // ユーザー登録
-    "form/register" => Route::create("form/register", function (): HTTPRenderer {
+    "form/user/register" => Route::create("form/user/register", function (): HTTPRenderer {
         try {
             if ($_SERVER["REQUEST_METHOD"] !== "POST") {
                 throw new Exception("Invalid request method");
@@ -86,10 +87,10 @@ return [
             // 入力値検証
             $fieldErrors = ValidationHelper::validateFields([
                 "name" => ValueType::STRING,
-                "username" => ValueType::STRING,
+                "username" => ValueType::USERNAME,
                 "email" => ValueType::EMAIL,
                 "password" => ValueType::PASSWORD,
-                "confirm_password" => ValueType::PASSWORD,
+                "confirm-password" => ValueType::PASSWORD,
             ], $_POST);
 
             if ($userDao->getByEmail($_POST["email"])) {
@@ -98,11 +99,11 @@ return [
 
             if (
                 !array_key_exists("password", $fieldErrors) &&
-                !array_key_exists("confirm_password", $fieldErrors) &&
-                $_POST["password"] !== $_POST["confirm_password"]
+                !array_key_exists("confirm-password", $fieldErrors) &&
+                $_POST["password"] !== $_POST["confirm-password"]
             ) {
                 $fieldErrors["password"] = "パスワードが一致しません";
-                $fieldErrors["confirm_password"] = "パスワードが一致しません";
+                $fieldErrors["confirm-password"] = "パスワードが一致しません";
             }
 
             // 入力値に問題がある場合、JSONレスポンスを返す
@@ -152,7 +153,7 @@ return [
             return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました"]);
         }
     })->setMiddleware(["guest"]),
-    // メール送信後
+    // 認証メール送信後
     "verify/resend" => Route::create("verify/resend", function (): HTTPRenderer {
         return new HTMLRenderer("pages/verify_resend", []);
     })->setMiddleware(["auth"]),
@@ -213,7 +214,7 @@ return [
 
             FlashData::setFlashData("success", "メール認証が完了しました");
 
-            return new RedirectRenderer("profile");
+            return new RedirectRenderer("profile?user=" . $authenticatedUser->getUsername());
         } catch (\Exception $e) {
             error_log($e->getMessage());
             FlashData::setFlashData("error", "メール認証に失敗しました");
@@ -310,13 +311,13 @@ return [
             // 入力値検証
             $fieldErrors = ValidationHelper::validateFields([
                 "password" => ValueType::PASSWORD,
-                "confirm_password" => ValueType::PASSWORD,
+                "confirm-password" => ValueType::PASSWORD,
             ], $_POST);
 
-            if (!array_key_exists("password", $fieldErrors) && !array_key_exists("confirm_password", $fieldErrors) &&
-                $_POST["password"] !== $_POST["confirm_password"]) {
+            if (!array_key_exists("password", $fieldErrors) && !array_key_exists("confirm-password", $fieldErrors) &&
+                $_POST["password"] !== $_POST["confirm-password"]) {
                 $fieldErrors["password"] = "パスワードが一致しません";
-                $fieldErrors["confirm_password"] = "パスワードが一致しません";
+                $fieldErrors["confirm-password"] = "パスワードが一致しません";
             }
 
             if (!empty($fieldErrors)) {
@@ -400,6 +401,87 @@ return [
         } catch (\Exception $e) {
             error_log($e->getMessage());
             return new JSONRenderer(["status" => "error", "message" => $e->getMessage()]);
+        }
+    })->setMiddleware(["auth", "verify"]),
+    // プロフィール更新
+    "form/profile/update" => Route::create("form/profile/update", function (): HTTPRenderer {
+        try {
+            if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+                throw new Exception("Invalid request method");
+            }
+
+            $fieldErrors = ValidationHelper::validateFields([
+                "name" => ValueType::STRING,
+                "username" => ValueType::USERNAME,
+            ], $_POST);
+
+            $sameUsernameUser = DAOFactory::getUserDAO()->getByUsername($_POST["username"]);
+            if (isset($fieldErrors["username"]) && $sameUsernameUser !== null && $sameUsernameUser->getUserId() !== Authenticate::getAuthenticatedUser()->getUserId()) {
+                $fieldErrors["username"] = "このユーザー名は既に使用されています";
+            }
+
+            if ($_POST["profile-text"] !== null && mb_strlen($_POST["profile-text"]) > 160) {
+                $fieldErrors["profile-text"] = "プロフィールは160文字以内で入力してください";
+            }
+            
+            $profileImageType = $_POST["profile-image-type"];
+            $fileError = $_FILES["profile-image"]["error"];
+            if ($profileImageType === "custom") {
+                if ($fileError === UPLOAD_ERR_OK) {
+                    if (!ValidationHelper::validateImageType($_FILES["profile-image"]["type"])) {
+                        $fieldErrors["profile-image"] =
+                            "ファイル形式が不適切です。JPG, JPEG, PNG, GIFのファイルが設定可能です。";
+                    } else if (!ValidationHelper::validateImageSize($_FILES["profile-image"]["size"])) {
+                        $fieldErrors["profile-image"] =
+                            "ファイルが大きすぎます。";
+                    }
+                } else if ($fileError !== UPLOAD_ERR_NO_FILE) {
+                    $fieldErrors["profile-image"] =
+                        "ファイルサイズ等の問題によりこの画像は設定できません。";
+                }
+            }
+
+            if (!empty($fieldErrors)) {
+                return new JSONRenderer(["status" => "fieldErrors", "message" => $fieldErrors]);
+            }
+
+            // 認証済みユーザーを取得
+            $user = Authenticate::getAuthenticatedUser();
+
+             // プロフィール画像を保存
+            if ($profileImageType === "custom" && $fileError === UPLOAD_ERR_OK) {
+                $imageHash = ImageHelper::saveProfileImage(
+                    $_FILES["profile-image"]["tmp_name"],
+                    ImageHelper::imageTypeToExtension($_FILES["profile-image"]["type"]),
+                    $user->getUsername(),
+                );
+            } else if ($profileImageType === "custom") {
+                $imageHash = $user->getProfileImageHash();
+            } else {
+                $imageHash = null;
+            }
+
+            // 元のプロフィール画像が不要になる場合は削除
+            // 元々画像を設定されているケースで、デフォルト画像を使用or新しい画像を設定した場合
+            if ($user->getProfileImageHash() !== null) {
+                if ($profileImageType === "default" || ($profileImageType === "custom" && $fileError === UPLOAD_ERR_OK)) {
+                    ImageHelper::deleteProfileImage($user->getProfileImageHash());
+                }
+            }
+
+            // ユーザーのデータを更新
+            $user->setName($_POST["name"]);
+            $user->setUsername($_POST["username"]);
+            $user->setProfileText($_POST["profile-text"]);
+            $user->setProfileImageHash($imageHash);
+
+            $userDao = DAOFactory::getUserDAO();
+            $userDao->update($user);
+
+            return new JSONRenderer(["status" => "success", "message" => "プロフィールが更新されました"]);
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました"]);
         }
     })->setMiddleware(["auth", "verify"]),
 ];
