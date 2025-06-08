@@ -1,6 +1,6 @@
 <?php if ($user !== null && $user->getEmailConfirmedAt() !== null): ?>
     <div id="sidebar" class="col-auto col-sm-4 col-md-3 col-xl-2 px-sm-1 px-0">
-        <div class="d-flex flex-column align-items-center align-items-sm-start px-2 pt-2 min-vh-100"  style="display:inline-block;">
+        <div class="d-flex flex-column align-items-center align-items-sm-start px-2 pt-2 min-vh-100" style="display:inline-block;">
             <span class="fs-5 d-none d-sm-inline text-light">SNS</span>
             <ul class="nav nav-pills flex-column mb-sm-auto mt-0 mt-sm-3 align-items-center align-items-sm-start" id="menu">
                 <li class="nav-item mb-2">
@@ -46,9 +46,17 @@
                     </a>
                 </li>
             </ul>
+            <div id="profile-dropdown" class="dropdown mb-4">
+                <a href="#" class="d-flex align-items-center text-light text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="text-light d-none d-sm-inline mx-1">@<?= $user->getUsername() ?></span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-light shadow">
+                    <li><a class="dropdown-item" href="/user/delete">アカウント削除</a></li>
+                </ul>
+            </div>
         </div>
     </div>
     <div id="main-content" class="col bg-light text-dark" style="max-height: 100vh; overflow-y: hidden;">
-    <!-- 下のコメントアウト部分を各ページファイルで作成する -->
-    <!-- Content area... -->
-<?php endif; ?>
+        <!-- 下のコメントアウト部分を各ページファイルで作成する -->
+        <!-- Content area... -->
+    <?php endif; ?>
