@@ -57,7 +57,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="register-confirm-password" class="form-label">パスワード確認用</label>
-                        <input type="password" class="form-control" id="register-confirm-password" name="confirm_password">
+                        <input type="password" class="form-control" id="register-confirm-password" name="confirm-password">
                     </div>
                     <button type="submit" class="btn btn-primary w-100" id="register-btn">登録</button>
                 </form>
