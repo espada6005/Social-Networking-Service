@@ -531,16 +531,17 @@ return [
         }
     })->setMiddleware(["auth", "verify"]),
     // フォロワー一覧
-    "followers" => Route::create("/followers", function(): HTTPRenderer {
+    "followers" => Route::create("followers", function(): HTTPRenderer {
         return new HTMLRenderer("pages/followers", []);
     })->setMiddleware(["auth", "verify"]),
     // フォロワー一覧取得
     "followers/init" => Route::create("followers/init", function(): HTTPRenderer {
-        $resBody = ["success" => true];
+        if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+            throw new Exception("Invalid request method");
+        }
 
         try {
             $username = $_POST["user"];
-            $authenticatedUser = Authenticate::getAuthenticatedUser();
 
             if ($username === "") {
                 $user = Authenticate::getAuthenticatedUser();
@@ -550,7 +551,7 @@ return [
             }
 
             if ($user === null) {
-                $resBody["followers"] = null;
+                $followers = null;
             } else {
                 $followDao = DAOFactory::getFollowDAO();
 
@@ -569,16 +570,16 @@ return [
                         "userType" => $followers[$i]["type"],
                     ];
                 }
-
-                $resBody["followers"] = $followers;
             }
 
-            return new JSONRenderer($resBody);
+            return new JSONRenderer(["status" => "success", "followers" => $followers]);
         } catch (Exception $e) {
             error_log($e->getMessage());
-            $resBody["success"] = false;
-            $resBody["error"] = "エラーが発生しました。";
-            return new JSONRenderer($resBody);
+            return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました。"]);
         }
+    })->setMiddleware(["auth", "verify"]),
+    // フォロー一覧
+    "followees" => Route::create("followees", function(): HTTPRenderer {
+        return new HTMLRenderer("pages/followees", []);
     })->setMiddleware(["auth", "verify"]),
 ];
