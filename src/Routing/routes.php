@@ -530,4 +530,8 @@ return [
             return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました"]);
         }
     })->setMiddleware(["auth", "verify"]),
+    // フォロワー一覧
+    "/followers" => Route::create("/followers", function(): HTTPRenderer {
+        return new HTMLRenderer("pages/followers", []);
+    })->setMiddleware(["auth", "verify"]),
 ];
