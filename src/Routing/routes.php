@@ -531,7 +531,54 @@ return [
         }
     })->setMiddleware(["auth", "verify"]),
     // フォロワー一覧
-    "/followers" => Route::create("/followers", function(): HTTPRenderer {
+    "followers" => Route::create("/followers", function(): HTTPRenderer {
         return new HTMLRenderer("pages/followers", []);
+    })->setMiddleware(["auth", "verify"]),
+    // フォロワー一覧取得
+    "followers/init" => Route::create("followers/init", function(): HTTPRenderer {
+        $resBody = ["success" => true];
+
+        try {
+            $username = $_POST["user"];
+            $authenticatedUser = Authenticate::getAuthenticatedUser();
+
+            if ($username === "") {
+                $user = Authenticate::getAuthenticatedUser();
+            } else {
+                $userDao = DAOFactory::getUserDAO();
+                $user = $userDao->getByUsername($username);
+            }
+
+            if ($user === null) {
+                $resBody["followers"] = null;
+            } else {
+                $followDao = DAOFactory::getFollowDAO();
+
+                $limit = $_POST["limit"] ?? 30;
+                $offset = $_POST["offset"] ?? 0;
+                $followers = $followDao->getFollowers($user->getUserId(), $limit, $offset);
+
+                for ($i = 0; $i < count($followers); $i++) {
+                    $followers[$i] = [
+                        "name" => $followers[$i]["name"],
+                        "username" => $followers[$i]["username"],
+                        "profileImagePath" => $followers[$i]["profile_image_hash"] ?
+                            PROFILE_IMAGE_FILE_DIR . $followers[$i]["profile_image_hash"] :
+                            PROFILE_IMAGE_FILE_DIR . "default_profile_image.png",
+                        "profilePath" => "/user?un=" . $followers[$i]["username"],
+                        "userType" => $followers[$i]["type"],
+                    ];
+                }
+
+                $resBody["followers"] = $followers;
+            }
+
+            return new JSONRenderer($resBody);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            $resBody["success"] = false;
+            $resBody["error"] = "エラーが発生しました。";
+            return new JSONRenderer($resBody);
+        }
     })->setMiddleware(["auth", "verify"]),
 ];
