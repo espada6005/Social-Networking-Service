@@ -33,7 +33,7 @@
                     </div>
                 </form>
                 <hr>
-                <a id="guest-login" class="btn btn-secondary w-100 mt-3">ゲストログイン</a>
+                <a id="guest-login" href="/guest/login" class="btn btn-secondary w-100 mt-3">ゲストログイン</a>
             </div>
             <!-- 新規登録フォーム -->
             <div class="tab-pane fade" id="register" role="tabpanel" aria-labelledby="register-tab">
@@ -67,5 +67,4 @@
 </div>
 <script src="js/common.js"></script>
 <script src="js/login.js"></script>
-<script src="js/guest_login.js"></script>
 <script src="js/register.js"></script>
