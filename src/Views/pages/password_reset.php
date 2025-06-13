@@ -37,6 +37,4 @@
         </div>
     </div>
 </div>
-
-<script src="/js/common.js"></script>
 <script src="/js/password_reset.js"></script>
