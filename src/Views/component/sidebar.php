@@ -34,7 +34,7 @@
                     </a>
                 </li>
                 <li class="nav-item mb-2">
-                    <a href="#" class="nav-link p-1 d-flex align-items-center text-light">
+                    <a href="" class="nav-link p-1 d-flex align-items-center text-light" data-bs-toggle="modal" data-bs-target="#createPostModal">
                         <ion-icon name="create-outline"></ion-icon>
                         <span class="fs-5 ms-2 d-none d-sm-inline">投稿</span>
                     </a>
