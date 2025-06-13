@@ -38,6 +38,8 @@ class HTMLRenderer implements HTTPRenderer {
         ob_start();
         $user = Authenticate::getAuthenticatedUser();
         require $this->getViewPath("layout/header");
+        require $this->getViewPath("component/post_modal");
+        require $this->getViewPath("component/reply_modal");
         require $this->getViewPath("component/message-boxes");
         require $this->getViewPath("component/sidebar");
         return ob_get_clean();
