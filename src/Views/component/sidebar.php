@@ -36,7 +36,7 @@
                 <li class="nav-item mb-2">
                     <a href="#" class="nav-link p-1 d-flex align-items-center text-light">
                         <ion-icon name="create-outline"></ion-icon>
-                        <span class="fs-5 ms-2 d-none d-sm-inline">作成</span>
+                        <span class="fs-5 ms-2 d-none d-sm-inline">投稿</span>
                     </a>
                 </li>
                 <li class="nav-item mb-2">
