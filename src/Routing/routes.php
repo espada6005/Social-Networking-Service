@@ -582,4 +582,48 @@ return [
     "followees" => Route::create("followees", function(): HTTPRenderer {
         return new HTMLRenderer("pages/followees", []);
     })->setMiddleware(["auth", "verify"]),
+    // フォロー一覧取得
+    "followees/init" => Route::create("followees/init", function(): HTTPRenderer {
+        if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+            throw new Exception("Invalid request method");
+        }
+
+        try {
+            $username = $_POST["user"];
+
+            if ($username === "") {
+                $user = Authenticate::getAuthenticatedUser();
+            } else {
+                $userDao = DAOFactory::getUserDAO();
+                $user = $userDao->getByUsername($username);
+            }
+
+            if ($user === null) {
+                $followees = null;
+            } else {
+                $followDao = DAOFactory::getFollowDAO();
+
+                $limit = $_POST["limit"] ?? 30;
+                $offset = $_POST["offset"] ?? 0;
+                $followees = $followDao->getFollowees($user->getUserId(), $limit, $offset);
+
+                for ($i = 0; $i < count($followees); $i++) {
+                    $followees[$i] = [
+                        "name" => $followees[$i]["name"],
+                        "username" => $followees[$i]["username"],
+                        "profileImagePath" => $followees[$i]["profile_image_hash"] ?
+                            PROFILE_IMAGE_FILE_DIR . $followees[$i]["profile_image_hash"] :
+                            PROFILE_IMAGE_FILE_DIR . "default_profile_image.png",
+                        "profilePath" => "/user?un=" . $followees[$i]["username"],
+                        "userType" => $followees[$i]["type"],
+                    ];
+                };
+            }
+
+            return new JSONRenderer(["status" => "success", "followees" => $followees]);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました。"]);
+        }
+    })->setMiddleware(["auth", "verify"]),
 ];
