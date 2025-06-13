@@ -67,5 +67,5 @@
 </div>
 <script src="js/common.js"></script>
 <script src="js/login.js"></script>
-<script src="js/guest-login.js"></script>
+<script src="js/guest_login.js"></script>
 <script src="js/register.js"></script>
