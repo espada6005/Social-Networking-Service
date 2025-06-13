@@ -38,9 +38,11 @@ return [
             // ゲストユーザーとしてログイン
             Authenticate::loginAsUser($guestUser);
 
-            return new JSONRenderer(["status" => "success", "redirectUrl" => "timeline"]);
+            return new  RedirectRenderer("timeline");
         } catch (\Exception $e) {
-            return new JSONRenderer(["status" => "error", "message" => $e->getMessage()]);
+            error_log($e->getMessage());
+            FlashData::setFlashData("error", "ゲストログインに失敗しました");
+            return new RedirectRenderer("/");
         }
     })->setMiddleware(["guest"]),
     // ログイン
