@@ -15,6 +15,4 @@
         </div>
     </div>
 </div>
-
-<script src="/js/common.js"></script>
 <script src="/js/verify_resend.js"></script>
