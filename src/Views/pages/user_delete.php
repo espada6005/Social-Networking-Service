@@ -21,6 +21,4 @@
         </div>
     </div>
 </div>
-
-<script src="/js/common.js"></script>
 <script src="/js/user_delete.js"></script>
