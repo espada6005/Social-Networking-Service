@@ -3,11 +3,14 @@
 use Database\DataAccess\DAOFactory;
 use Exceptions\AuthenticationFailureException;
 use Helpers\Authenticate;
+use Helpers\DateTimeHelper;
 use Helpers\ImageHelper;
 use Helpers\MailSender;
 use Helpers\Settings;
 use Helpers\ValidationHelper;
+use Models\Notification;
 use Models\PasswordResetToken;
+use Models\Post;
 use Models\User;
 use Response\FlashData;
 use Response\HTTPRenderer;
@@ -88,7 +91,7 @@ return [
 
             // 入力値検証
             $fieldErrors = ValidationHelper::validateFields([
-                "name" => ValueType::STRING,
+                "name" => ValueType::NAME,
                 "username" => ValueType::USERNAME,
                 "email" => ValueType::EMAIL,
                 "password" => ValueType::PASSWORD,
@@ -459,7 +462,7 @@ return [
             }
 
             $fieldErrors = ValidationHelper::validateFields([
-                "name" => ValueType::STRING,
+                "name" => ValueType::NAME,
                 "username" => ValueType::USERNAME,
             ], $_POST);
 
@@ -538,11 +541,11 @@ return [
     })->setMiddleware(["auth", "verify"]),
     // フォロワー一覧取得
     "followers/init" => Route::create("followers/init", function(): HTTPRenderer {
-        if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-            throw new Exception("Invalid request method");
-        }
-
         try {
+            if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+                throw new Exception("Invalid request method");
+            }
+
             $username = $_POST["user"];
 
             if ($username === "") {
@@ -586,11 +589,11 @@ return [
     })->setMiddleware(["auth", "verify"]),
     // フォロー一覧取得
     "followees/init" => Route::create("followees/init", function(): HTTPRenderer {
-        if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-            throw new Exception("Invalid request method");
-        }
-
         try {
+            if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+                throw new Exception("Invalid request method");
+            }
+
             $username = $_POST["user"];
 
             if ($username === "") {
@@ -623,6 +626,126 @@ return [
             }
 
             return new JSONRenderer(["status" => "success", "followees" => $followees]);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました。"]);
+        }
+    })->setMiddleware(["auth", "verify"]),
+    // ポスト作成
+    "post/create" => Route::create("post/create", function(): HTTPRenderer {
+        if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+            throw new Exception("Invalid request method");
+        }
+
+        try {
+            $user = Authenticate::getAuthenticatedUser();
+            $postDao = DAOFactory::getPostDAO();
+
+            // 入力値検証
+            if (!in_array($_POST["type"], ["create", "draft", "schedule"])) {
+                throw new Exception("リクエストデータが不適切です。");
+            }
+
+            if ($_POST["post-content"] !== null && mb_strlen($_POST["post-content"]) > 140) {
+                $fieldErrors["post-content"] = "投稿内容は140文字以内で入力してください";
+            }
+
+            $postImageUploaded = $_FILES["post-image"]["error"] === UPLOAD_ERR_OK;
+            if ($postImageUploaded) {
+                if (!ValidationHelper::validateImageType($_FILES["post-image"]["type"])) {
+                    $fieldErrors["post-image"] =
+                        "ファイル形式が不適切です。JPG, JPEG, PNG, GIFのファイルが設定可能です。";
+                } else if (!ValidationHelper::validateImageSize($_FILES["post-image"]["size"])) {
+                    $fieldErrors["post-image"] =
+                        "ファイルが大きすぎます。";
+                }
+            }
+
+            if ($_POST["type"] === "schedule") {
+                if ($_POST["post-scheduled-at"] === null || !ValidationHelper::validateDateTime($_POST["post-scheduled-at"])) {
+                    $fieldErrors["post-scheduled-at"] =
+                        "日付を正しく設定してください。";
+                }
+            }
+
+            // 入力値検証でエラーが存在すれば、そのエラー情報をレスポンスとして返す
+            if (!empty($fieldErrors)) {
+                return new JSONRenderer(["status" => "fieldErrors", "message" => $fieldErrors]);
+            }
+
+            // 画像を保存
+            if ($postImageUploaded) {
+                $imageHash = ImageHelper::savePostImage(
+                    $_FILES["post-image"]["tmp_name"],
+                    ImageHelper::imageTypeToExtension($_FILES["post-image"]["type"]),
+                    $user->getUsername(),
+                );
+            }
+
+            // 返信ポストかどうかを判定
+            $isReply = intval($_POST["post-reply-to-id"] ?? "0") !== 0;
+            if ($isReply) {
+                $parentPost = $postDao->getPostById($_POST["post-reply-to-id"]);
+                if ($parentPost === null) {
+                    throw new Exception("返信先のポストが存在しません。");
+                }
+            }
+
+            // 新しいPostオブジェクトを作成
+            $status = "POSTED";
+            // if ($_POST["type"] === "draft") $status = "SAVED";
+            // else if ($_POST["type"] === "schedule") $status = "SCHEDULED";
+            if ($_POST["type"] === "schedule") $status = "SCHEDULED";
+
+            $post = new Post(
+                content: $_POST["post-content"],
+                status: $status,
+                user_id: $user->getUserId(),
+                reply_to_id: $isReply ? $parentPost->getPostId() : null,
+            );
+
+            if ($postImageUploaded) {
+                $post->setImageHash($imageHash);
+            }
+
+            if ($status === "SCHEDULED") {
+                $post->setScheduledAt($_POST["post-scheduled-at"]);
+            }
+
+            // ポストを作成
+            $success = $postDao->create($post);
+
+            if (!$success) {
+                throw new Exception("ポスト作成に失敗しました。");
+            }
+
+            // 通知を作成
+            if ($isReply && $user->getUserId() !== $parentPost->getUserId()) {
+                $notification = new Notification(
+                    from_user_id: $user->getUserId(),
+                    to_user_id: $parentPost->getUserId(),
+                    source_id: $parentPost->getPostId(),
+                    type: "REPLY",
+                );
+                $notificationDao = DAOFactory::getNotificationDAO();
+                $result = $notificationDao->create($notification);
+                if (!$result) {
+                    throw new Exception("通知作成処理に失敗しました。");
+                }
+            }
+
+            $message = $isReply ? "返信しました。" : "ポストを作成しました。";
+
+            if ($status === "SCHEDULED") {
+                $message = "ポストを予約しました。";
+            }
+            FlashData::setFlashData("success", $message);
+
+            if ($isReply) {
+                $redirectUrl = "/post?id=" . $_POST["post-reply-to-id"];
+            }
+
+            return new JSONRenderer(["status" => "success", "redirectUrl" => $redirectUrl]);
         } catch (Exception $e) {
             error_log($e->getMessage());
             return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました。"]);
