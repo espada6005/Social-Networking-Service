@@ -2,6 +2,7 @@
 
 namespace Helpers;
 
+use DateTime;
 use Types\ValueType;
 
 class ValidationHelper {
@@ -16,7 +17,7 @@ class ValidationHelper {
             $value = $data[$field];
 
             switch ($type) {
-                case ValueType::STRING:
+                case ValueType::NAME:
                     if (!self::validateString($value)) {
                         $validatedData[$field] = "1文字以上50文字以内で入力してください";
                     }
@@ -90,6 +91,11 @@ class ValidationHelper {
 
     public static function validateImageSize(int $size, int $min = 1, int $max = 1048576): bool {
         return $size >= $min && $size <= $max;
+    }
+
+    public static function validateDateTime($datetime, $format = 'Y/m/d H:i'): bool {
+        $dt = DateTime::createFromFormat($format, $datetime);
+        return $dt && $dt->format($format) === $datetime;
     }
 
 }
