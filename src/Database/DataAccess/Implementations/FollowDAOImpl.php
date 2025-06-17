@@ -152,7 +152,7 @@ class FollowDAOImpl implements FollowDAO {
             FROM
                 follows
             WHERE
-                followee_id = ?;
+                follower_id = ?;
         QUERY;
 
         $result = $mysqli->prepareAndFetchAll($query, "d", [$user_id]) ?? null;
