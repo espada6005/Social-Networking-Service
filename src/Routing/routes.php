@@ -629,11 +629,11 @@ return [
     })->setMiddleware(["auth", "verify"]),
     // ポスト作成
     "post/create" => Route::create("post/create", function(): HTTPRenderer {
-        if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-            throw new Exception("Invalid request method");
-        }
-
         try {
+            if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+                throw new Exception("Invalid request method");
+            }
+
             $user = Authenticate::getAuthenticatedUser();
             $postDao = DAOFactory::getPostDAO();
 
@@ -749,8 +749,6 @@ return [
     })->setMiddleware(["auth", "verify"]),
     // ポスト一覧取得
     "posts/init" => Route::create("posts/init", function(): HTTPRenderer {
-        $resBody = ["success" => true];
-
         try {
             if ($_SERVER["REQUEST_METHOD"] !== "POST") {
                 throw new Exception("Invalid request method");
@@ -797,18 +795,61 @@ return [
                     "deletable" => $authenticatedUser->getUsername() === $posts[$i]["username"],
                 ];
             }
-
-            $resBody["posts"] = $posts;
-            return new JSONRenderer($resBody);
+            return new JSONRenderer(["status" => "success", "posts" => $posts]);
         } catch (Exception $e) {
             error_log($e->getMessage());
-            $resBody["success"] = false;
-            $resBody["error"] = "エラーが発生しました。";
-            return new JSONRenderer($resBody);
+            return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました。"]);
         }
     })->setMiddleware(["auth", "verify"]),
     // タイムライン
     "timeline" => Route::create("timeline", function (): HTTPRenderer {
         return new HTMLRenderer("pages/timeline", []);
+    })->setMiddleware(["auth", "verify"]),
+    // タイムライン取得
+    "timeline/trend/init" => Route::create("timeline/trend/init", function (): HTTPRenderer {
+        try {
+            if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+                throw new Exception("Invalid request method");
+            }
+
+            $authenticatedUser = Authenticate::getAuthenticatedUser();
+            $postDao = DAOFactory::getPostDAO();
+
+            $limit = $_POST["limit"] ?? 30;
+            $offset = $_POST["offset"] ?? 0;
+            $userId = $authenticatedUser->getUserId();
+            $posts = $postDao->getTrendTimelinePosts($userId, $limit, $offset);
+
+            for ($i = 0; $i < count($posts); $i++) {
+                $posts[$i] = [
+                    "postId" => $posts[$i]["post_id"],
+                    "content" => $posts[$i]["content"],
+                    "imagePath" => $posts[$i]["image_hash"] ?
+                        POST_ORIGINAL_IMAGE_FILE_DIR . $posts[$i]["image_hash"] :
+                        "",
+                    "thumbnailPath" => $posts[$i]["image_hash"] ?
+                        POST_THUMBNAIL_IMAGE_FILE_DIR . $posts[$i]["image_hash"] :
+                        "",
+                    "postPath" => "/post?id=" . $posts[$i]["post_id"],
+                    "postedAt" => DateTimeHelper::getTimeDiff($posts[$i]["updated_at"]),
+                    "replyCount" => $posts[$i]["reply_count"],
+                    "likeCount" => $posts[$i]["like_count"],
+                    "liked" => $posts[$i]["liked"],
+                    "name" => $posts[$i]["name"],
+                    "username" => $posts[$i]["username"],
+                    "profileImagePath" => $posts[$i]["profile_image_hash"] ?
+                        PROFILE_IMAGE_FILE_DIR . $posts[$i]["profile_image_hash"] :
+                        PROFILE_IMAGE_FILE_DIR . "default_profile_image.png",
+                    "profilePath" => "/user?un=" . $posts[$i]["username"],
+                    "userType" => $posts[$i]["type"],
+                    "deletable" => $authenticatedUser->getUsername() === $posts[$i]["username"],
+                ];
+            }
+
+            return new JSONRenderer(["status" => "success", "posts" => $posts]);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました。"]);
+        }
     })->setMiddleware(["auth", "verify"]),
 ];
