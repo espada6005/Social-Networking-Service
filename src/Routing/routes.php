@@ -400,10 +400,6 @@ return [
             return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました"]);
         }
     })->setMiddleware(["guest"]),
-    // タイムライン
-    "timeline" => Route::create("timeline", function (): HTTPRenderer {
-        return new HTMLRenderer("pages/timeline", []);
-    })->setMiddleware(["auth", "verify"]),
     // ユーザープロフィール
     "profile" => Route::create("profile", function (): HTTPRenderer {
         return new HTMLRenderer("pages/profile", []);
@@ -810,5 +806,9 @@ return [
             $resBody["error"] = "エラーが発生しました。";
             return new JSONRenderer($resBody);
         }
+    })->setMiddleware(["auth", "verify"]),
+    // タイムライン
+    "timeline" => Route::create("timeline", function (): HTTPRenderer {
+        return new HTMLRenderer("pages/timeline", []);
     })->setMiddleware(["auth", "verify"]),
 ];
