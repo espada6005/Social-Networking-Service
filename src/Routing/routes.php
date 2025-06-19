@@ -8,6 +8,7 @@ use Helpers\ImageHelper;
 use Helpers\MailSender;
 use Helpers\Settings;
 use Helpers\ValidationHelper;
+use Models\Follow;
 use Models\Notification;
 use Models\PasswordResetToken;
 use Models\Post;
@@ -531,6 +532,99 @@ return [
             return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました"]);
         }
     })->setMiddleware(["auth", "verify"]),
+    // フォロー
+    "follow" => Route::create("follow", function(): HTTPRenderer {
+        try {
+            if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+                throw new Exception("Invalid request method");
+            }
+
+            $username = $_POST["user"];
+            if ($username === "") {
+                throw new Exception("パラメータが不適切です。");
+            }
+
+            $userDao = DAOFactory::getUserDAO();
+            $user = $userDao->getByUsername($username);
+            $authenticatedUser = Authenticate::getAuthenticatedUser();
+
+            if ($user === null) {
+                throw new Exception("フォロー対象のユーザーが存在しません。");
+            } else if ($user->getUserId() === $authenticatedUser->getUserId()) {
+                throw new Exception("フォロー対象のユーザーが不適切です。");
+            }
+
+            $followDao = DAOFactory::getFollowDAO();
+            $isFollowee = $followDao->isFollowee($authenticatedUser->getUserId(), $user->getUserId());
+            if ($isFollowee) {
+                throw new Exception("既にフォローしています。");
+            }
+
+            $follow = new Follow(
+                follower_id: $authenticatedUser->getUserId(),
+                followee_id: $user->getUserId(),
+            );
+            $result = $followDao->create($follow);
+            if (!$result) {
+                throw new Exception("フォロー処理に失敗しました。");
+            }
+
+            $notification = new Notification(
+                from_user_id: $authenticatedUser->getUserId(),
+                to_user_id: $user->getUserId(),
+                type: "FOLLOW",
+            );
+            $notificationDao = DAOFactory::getNotificationDAO();
+            $result = $notificationDao->create($notification);
+            if (!$result) {
+                throw new Exception("通知作成処理に失敗しました。");
+            }
+
+            return new JSONRenderer(["status" => "success"]);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました。"]);
+        }
+    })->setMiddleware(["auth", "verify"]),
+    // フォロー解除
+    "unfollow" => Route::create("unfollow", function(): HTTPRenderer {
+        try {
+            if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+                throw new Exception("Invalid request method");
+            }
+
+            $username = $_POST["user"];
+            if ($username === "") {
+                throw new Exception("パラメータが不適切です。");
+            }
+
+            $userDao = DAOFactory::getUserDAO();
+            $user = $userDao->getByUsername($username);
+            $authenticatedUser = Authenticate::getAuthenticatedUser();
+
+            if ($user === null) {
+                throw new Exception("アンフォロー対象のユーザーが存在しません。");
+            } else if ($user->getUserId() === $authenticatedUser->getUserId()) {
+                throw new Exception("アンフォロー対象のユーザーが不適切です。");
+            }
+
+            $followDao = DAOFactory::getFollowDAO();
+            $isFollowee = $followDao->isFollowee($authenticatedUser->getUserId(), $user->getUserId());
+            if (!$isFollowee) {
+                throw new Exception("現在フォローしているユーザーではありません。");
+            }
+
+            $result = $followDao->delete($authenticatedUser->getUserId(), $user->getUserId());
+            if (!$result) {
+                throw new Exception("アンフォロー処理に失敗しました。");
+            }
+
+            return new JSONRenderer(["status" => "success"]);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました。"]);
+        }
+    })->setMiddleware(["auth", "verify"]),
     // フォロワー一覧
     "followers" => Route::create("followers", function(): HTTPRenderer {
         return new HTMLRenderer("pages/followers", []);
@@ -689,9 +783,10 @@ return [
 
             // 新しいPostオブジェクトを作成
             $status = "POSTED";
-            // if ($_POST["type"] === "draft") $status = "SAVED";
-            // else if ($_POST["type"] === "schedule") $status = "SCHEDULED";
-            if ($_POST["type"] === "schedule") $status = "SCHEDULED";
+
+            if ($_POST["type"] === "schedule") {
+                $status = "SCHEDULED";
+            }
 
             $post = new Post(
                 content: $_POST["post-content"],
@@ -790,7 +885,7 @@ return [
                     "profileImagePath" => $posts[$i]["profile_image_hash"] ?
                         PROFILE_IMAGE_FILE_DIR . $posts[$i]["profile_image_hash"] :
                         PROFILE_IMAGE_FILE_DIR . "default_profile_image.png",
-                    "profilePath" => "/user?un=" . $posts[$i]["username"],
+                    "profilePath" => "/profile?user=" . $posts[$i]["username"],
                     "userType" => $posts[$i]["type"],
                     "deletable" => $authenticatedUser->getUsername() === $posts[$i]["username"],
                 ];
@@ -840,7 +935,7 @@ return [
                     "profileImagePath" => $posts[$i]["profile_image_hash"] ?
                         PROFILE_IMAGE_FILE_DIR . $posts[$i]["profile_image_hash"] :
                         PROFILE_IMAGE_FILE_DIR . "default_profile_image.png",
-                    "profilePath" => "/user?un=" . $posts[$i]["username"],
+                    "profilePath" => "/profile?user=" . $posts[$i]["username"],
                     "userType" => $posts[$i]["type"],
                     "deletable" => $authenticatedUser->getUsername() === $posts[$i]["username"],
                 ];
