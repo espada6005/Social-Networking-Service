@@ -896,6 +896,10 @@ return [
             return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました。"]);
         }
     })->setMiddleware(["auth", "verify"]),
+    // ポスト詳細
+    "post" => Route::create("post", function(): HTTPRenderer {
+        return new HTMLRenderer("pages/post_detail", []);
+    })->setMiddleware(["auth", "verify"]),
     // タイムライン
     "timeline" => Route::create("timeline", function (): HTTPRenderer {
         return new HTMLRenderer("pages/timeline", []);
