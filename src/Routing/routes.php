@@ -900,6 +900,89 @@ return [
     "post" => Route::create("post", function(): HTTPRenderer {
         return new HTMLRenderer("pages/post_detail", []);
     })->setMiddleware(["auth", "verify"]),
+    // ポスト詳細取得
+    "post/detail" => Route::create("post/detail", function(): HTTPRenderer {
+        try {
+            if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+                throw new Exception("Invalid request method");
+            }
+
+            $postId = $_POST["postId"];
+
+            if ($postId === null) {
+                throw new Exception("リクエストデータが不適切です。");
+            }
+
+            $authenticatedUser = Authenticate::getAuthenticatedUser();
+            $postDao = DAOFactory::getPostDAO();
+            $post = $postDao->getPost($postId, $authenticatedUser->getUserId());
+
+            if ($post === null) {
+                $post = null;
+            } else {
+                $post = [
+                    "postId" => $post["post_id"],
+                    "content" => $post["content"],
+                    "imagePath" => $post["image_hash"] ?
+                        POST_ORIGINAL_IMAGE_FILE_DIR . $post["image_hash"] :
+                        "",
+                    "thumbnailPath" => $post["image_hash"] ?
+                        POST_THUMBNAIL_IMAGE_FILE_DIR . $post["image_hash"] :
+                        "",
+                    "postPath" => "/post?id=" . $post["post_id"],
+                    "postedAt" => DateTimeHelper::getTimeDiff($post["updated_at"]),
+                    "replyCount" => $post["reply_count"],
+                    "likeCount" => $post["like_count"],
+                    "liked" => $post["liked"],
+                    "name" => $post["name"],
+                    "username" => $post["username"],
+                    "profileImagePath" => $post["profile_image_hash"] ?
+                        PROFILE_IMAGE_FILE_DIR . $post["profile_image_hash"] :
+                        PROFILE_IMAGE_FILE_DIR . "default_profile_image.png",
+                    "profilePath" => "/user?un=" . $post["username"],
+                    "userType" => $post["type"],
+                    "deletable" => $authenticatedUser->getUsername() === $post["username"],
+                ];
+
+                if ($post["reply_to_id"]) {
+                    $post = $postDao->getPost($post["reply_to_id"], $authenticatedUser->getUserId());
+
+                    $parentPost = [
+                        "postId" => $post["post_id"],
+                        "content" => $post["content"],
+                        "imagePath" => $post["image_hash"] ?
+                            POST_ORIGINAL_IMAGE_FILE_DIR . $post["image_hash"] :
+                            "",
+                        "thumbnailPath" => $post["image_hash"] ?
+                            POST_THUMBNAIL_IMAGE_FILE_DIR . $post["image_hash"] :
+                            "",
+                        "postPath" => "/post?id=" . $post["post_id"],
+                        "postedAt" => DateTimeHelper::getTimeDiff($post["updated_at"]),
+                        "replyCount" => $post["reply_count"],
+                        "likeCount" => $post["like_count"],
+                        "liked" => $post["liked"],
+                        "name" => $post["name"],
+                        "username" => $post["username"],
+                        "profileImagePath" => $post["profile_image_hash"] ?
+                            PROFILE_IMAGE_FILE_DIR . $post["profile_image_hash"] :
+                            PROFILE_IMAGE_FILE_DIR . "default_profile_image.png",
+                        "profilePath" => "/user?un=" . $post["username"],
+                        "userType" => $post["type"],
+                        "deletable" => $authenticatedUser->getUsername() === $post["username"],
+                    ];
+                }
+            }
+
+            return new JSONRenderer([
+                "status" => "success",
+                "post" => $post,
+                "parentPost" => $parentPost ?? null,
+            ]);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました。"]);
+        }
+    })->setMiddleware(["auth", "verify"]),
     // タイムライン
     "timeline" => Route::create("timeline", function (): HTTPRenderer {
         return new HTMLRenderer("pages/timeline", []);
