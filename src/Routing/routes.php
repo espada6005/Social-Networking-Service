@@ -951,6 +951,61 @@ return [
             return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました。"]);
         }
     })->setMiddleware(["auth", "verify"]),
+    // いいね一覧取得
+    "likes/init" => Route::create("likes/init", function(): HTTPRenderer {
+        try {
+            if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+                throw new Exception("Invalid request method");
+            }
+
+            $postDao = DAOFactory::getPostDAO();
+            $username = $_POST["user"];
+            $authenticatedUser = Authenticate::getAuthenticatedUser();
+
+            if ($username === "") {
+                $user = Authenticate::getAuthenticatedUser();
+            } else {
+                $userDao = DAOFactory::getUserDAO();
+                $user = $userDao->getByUsername($username);
+            }
+
+            $limit = $_POST["limit"] ?? 30;
+            $offset = $_POST["offset"] ?? 0;
+            $userId = $user->getUserId();
+            $posts = $postDao->getUserLikes($userId, $authenticatedUser->getUserId(), $limit, $offset);
+
+            for ($i = 0; $i < count($posts); $i++) {
+                $posts[$i] = [
+                    "postId" => $posts[$i]["post_id"],
+                    "content" => $posts[$i]["content"],
+                    "imagePath" => $posts[$i]["image_hash"] ?
+                        POST_ORIGINAL_IMAGE_FILE_DIR . $posts[$i]["image_hash"] :
+                        "",
+                    "thumbnailPath" => $posts[$i]["image_hash"] ?
+                        POST_THUMBNAIL_IMAGE_FILE_DIR . $posts[$i]["image_hash"] :
+                        "",
+                    "postPath" => "/post?id=" . $posts[$i]["post_id"],
+                    "postedAt" => DateTimeHelper::getTimeDiff($posts[$i]["updated_at"]),
+                    "replyCount" => $posts[$i]["reply_count"],
+                    "likeCount" => $posts[$i]["like_count"],
+                    "liked" => $posts[$i]["liked"],
+                    "name" => $posts[$i]["name"],
+                    "username" => $posts[$i]["username"],
+                    "profileImagePath" => $posts[$i]["profile_image_hash"] ?
+                        PROFILE_IMAGE_FILE_DIR . $posts[$i]["profile_image_hash"] :
+                        PROFILE_IMAGE_FILE_DIR . "default_profile_image.png",
+                    "profilePath" => "/profile?user=" . $posts[$i]["username"],
+                    "userType" => $posts[$i]["type"],
+                    "deletable" => $authenticatedUser->getUsername() === $posts[$i]["username"],
+                ];
+            }
+
+            return new JSONRenderer(["status" => "success", "posts" => $posts]);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました。"]);
+        }
+    })->setMiddleware(["auth", "verify"]),
     // ポスト詳細
     "post" => Route::create("post", function(): HTTPRenderer {
         return new HTMLRenderer("pages/post_detail", []);
