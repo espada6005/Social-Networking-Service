@@ -1090,6 +1090,40 @@ return [
             return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました。"]);
         }
     })->setMiddleware(["auth", "verify"]),
+    // 予約ポスト一覧取得
+    "post/scheduled_posts/init" => Route::create("/api/post/scheduled_posts", function(): HTTPRenderer {
+        try {
+            if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+                throw new Exception("Invalid request method");
+            }
+
+            $limit = $_POST["limit"];
+            $offset = $_POST["offset"];
+
+            $authenticatedUser = Authenticate::getAuthenticatedUser();
+            $postDao = DAOFactory::getPostDAO();
+            $scheduledPosts = $postDao->getScheduledPosts($authenticatedUser->getUserId(), $limit, $offset);
+
+            $reservationPosts = array_map(function($post) {
+                return [
+                    "postId" => $post["post_id"],
+                    "content" => $post["content"],
+                    "imagePath" => $post["image_hash"] ?
+                        POST_ORIGINAL_IMAGE_FILE_DIR . $post["image_hash"] :
+                        "",
+                    "thumbnailPath" => $post["image_hash"] ?
+                        POST_THUMBNAIL_IMAGE_FILE_DIR . $post["image_hash"] :
+                        "",
+                    "scheduledAt" => DateTimeHelper::formatJpDateTime(DateTimeHelper::stringToDatetime($post["scheduled_at"])),
+                ];
+            }, $scheduledPosts);
+
+            return new JSONRenderer(["status" => "success", "scheduledPosts" => $reservationPosts]);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました。"]);
+        }
+    })->setMiddleware(["auth", "verify"]),
     // ポスト削除
     "post/delete" => Route::create("post/delete", function(): HTTPRenderer {
         try {
