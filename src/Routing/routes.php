@@ -898,10 +898,12 @@ return [
     })->setMiddleware(["auth", "verify"]),
     // リプライ一覧取得
     "replies/init" => Route::create("replies/init", function(): HTTPRenderer {
-        if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-            return new JSONRenderer(["success" => false, "error" => "不正なリクエストです。"]);
-        }
+
         try {
+            if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+                throw new Exception("Invalid request method");
+            }
+
             $postDao = DAOFactory::getPostDAO();
             $username = $_POST["user"];
             $authenticatedUser = Authenticate::getAuthenticatedUser();
@@ -992,7 +994,7 @@ return [
                     "profileImagePath" => $post["profile_image_hash"] ?
                         PROFILE_IMAGE_FILE_DIR . $post["profile_image_hash"] :
                         PROFILE_IMAGE_FILE_DIR . "default_profile_image.png",
-                    "profilePath" => "/user?un=" . $post["username"],
+                    "profilePath" => "/profile?user=" . $post["username"],
                     "userType" => $post["type"],
                     "deletable" => $authenticatedUser->getUsername() === $post["username"],
                 ];
@@ -1019,7 +1021,7 @@ return [
                         "profileImagePath" => $post["profile_image_hash"] ?
                             PROFILE_IMAGE_FILE_DIR . $post["profile_image_hash"] :
                             PROFILE_IMAGE_FILE_DIR . "default_profile_image.png",
-                        "profilePath" => "/user?un=" . $post["username"],
+                        "profilePath" => "/profile?user=" . $post["username"],
                         "userType" => $post["type"],
                         "deletable" => $authenticatedUser->getUsername() === $post["username"],
                     ];
@@ -1031,6 +1033,58 @@ return [
                 "post" => $post,
                 "parentPost" => $parentPost ?? null,
             ]);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました。"]);
+        }
+    })->setMiddleware(["auth", "verify"]),
+    // ポストリプライ
+    "post/replies" => Route::create("/api/post/replies", function(): HTTPRenderer {
+
+        try {
+            if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+                throw new Exception("Invalid request method");
+            }
+
+            $postId = $_POST["postId"];
+            $replyLimit = $_POST["replyLimit"];
+            $replyOffset = $_POST["replyOffset"];
+
+            if ($postId === null) {
+                throw new Exception("リクエストデータが不適切です。");
+            }
+
+            $authenticatedUser = Authenticate::getAuthenticatedUser();
+            $postDao = DAOFactory::getPostDAO();
+            $replies = $postDao->getReplies($postId, $authenticatedUser->getUserId(), $replyLimit, $replyOffset);
+
+            $postReplies = array_map(function($post) use ($authenticatedUser) {
+                return [
+                    "postId" => $post["post_id"],
+                    "content" => $post["content"],
+                    "imagePath" => $post["image_hash"] ?
+                        POST_ORIGINAL_IMAGE_FILE_DIR . $post["image_hash"] :
+                        "",
+                    "thumbnailPath" => $post["image_hash"] ?
+                        POST_THUMBNAIL_IMAGE_FILE_DIR . $post["image_hash"] :
+                        "",
+                    "postPath" => "/post?id=" . $post["post_id"],
+                    "postedAt" => DateTimeHelper::getTimeDiff($post["updated_at"]),
+                    "replyCount" => $post["reply_count"],
+                    "likeCount" => $post["like_count"],
+                    "liked" => $post["liked"],
+                    "name" => $post["name"],
+                    "username" => $post["username"],
+                    "profileImagePath" => $post["profile_image_hash"] ?
+                        PROFILE_IMAGE_FILE_DIR . $post["profile_image_hash"] :
+                        PROFILE_IMAGE_FILE_DIR . "default_profile_image.png",
+                    "profilePath" => "/profile?user=" . $post["username"],
+                    "userType" => $post["type"],
+                    "deletable" => $authenticatedUser->getUsername() === $post["username"],
+                ];
+            }, $replies);
+
+            return new JSONRenderer(["status" => "success", "replies" => $postReplies,]);
         } catch (Exception $e) {
             error_log($e->getMessage());
             return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました。"]);
