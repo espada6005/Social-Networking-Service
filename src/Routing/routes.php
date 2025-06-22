@@ -973,9 +973,9 @@ return [
             $post = $postDao->getPost($postId, $authenticatedUser->getUserId());
 
             if ($post === null) {
-                $post = null;
+                $detailPost = null;
             } else {
-                $post = [
+                $detailPost = [
                     "postId" => $post["post_id"],
                     "content" => $post["content"],
                     "imagePath" => $post["image_hash"] ?
@@ -1030,8 +1030,8 @@ return [
 
             return new JSONRenderer([
                 "status" => "success",
-                "post" => $post,
-                "parentPost" => $parentPost ?? null,
+                "post" => $detailPost,
+                "parentPost" => $parentPost,
             ]);
         } catch (Exception $e) {
             error_log($e->getMessage());
@@ -1085,6 +1085,31 @@ return [
             }, $replies);
 
             return new JSONRenderer(["status" => "success", "replies" => $postReplies,]);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました。"]);
+        }
+    })->setMiddleware(["auth", "verify"]),
+    // ポスト削除
+    "post/delete" => Route::create("post/delete", function(): HTTPRenderer {
+        try {
+            if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+                throw new Exception("Invalid request method");
+            }
+
+            $postDao = DAOFactory::getPostDAO();
+            $postId = $_POST["post_id"];
+            $authenticatedUser = Authenticate::getAuthenticatedUser();
+
+            $post = $postDao->getPost($postId, $authenticatedUser->getUserId());
+            if ($post["username"] !== $authenticatedUser->getUsername()) throw new Exception("このポストは削除できません。");
+
+            $postDao->delete($postId);
+            if ($post["image_hash"]) {
+                ImageHelper::deletePostImage($post["image_hash"]);
+            }
+
+            return new JSONRenderer(["status" => "success", "message" => "ポストを削除しました。"]);
         } catch (Exception $e) {
             error_log($e->getMessage());
             return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました。"]);
