@@ -1374,4 +1374,81 @@ return [
     "notifications" => Route::create("notifications", function(): HTTPRenderer {
         return new HTMLRenderer("pages/notifications", []);
     })->setMiddleware(["auth", "verify"]),
+    // 通知一覧取得
+    "notifications/init" => Route::create("notifications/init", function(): HTTPRenderer {
+        try {
+            if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+                throw new Exception("Invalid request method");
+            }
+
+            $authenticatedUser = Authenticate::getAuthenticatedUser();
+            $notificationDao = DAOFactory::getNotificationDAO();
+
+            $limit = $_POST["limit"] ?? 30;
+            $offset = $_POST["offset"] ?? 0;
+            $userId = $authenticatedUser->getUserId();
+            $notifications = $notificationDao->getUserNotifications($userId, $limit, $offset);
+
+            for ($i = 0; $i < count($notifications); $i++) {
+                if ($notifications[$i]["notification_type"] === "LIKE") {
+                    $notificationPath = "/post?id=" . $notifications[$i]["source_id"];
+                } else if ($notifications[$i]["notification_type"] === "FOLLOW") {
+                    $notificationPath = "/profile?user=" . $notifications[$i]["username"];
+                } else if ($notifications[$i]["notification_type"] === "REPLY") {
+                    $notificationPath = "/post?id=" . $notifications[$i]["source_id"];
+                } else {
+                    $notificationPath = "/messages/chat?user=" . $notifications[$i]["username"];
+                }
+
+                $notifications[$i] = [
+                    "notificationId" => $notifications[$i]["notification_id"],
+                    "notificationPath" => $notificationPath,
+                    "notificationType" => $notifications[$i]["notification_type"],
+                    "isRead" => $notifications[$i]["is_read"],
+                    "fromUserName" => $notifications[$i]["name"],
+                    "fromUserProfileImagePath" => $notifications[$i]["profile_image_hash"] ?
+                        PROFILE_IMAGE_FILE_DIR . $notifications[$i]["profile_image_hash"] :
+                        PROFILE_IMAGE_FILE_DIR . "default_profile_image.png",
+                    "fromUserProfilePath" => "/profile?user=" . $notifications[$i]["username"],
+                    "userType" => $notifications[$i]["user_type"],
+                ];
+            }
+
+            return new JSONRenderer(["status" => "success", "notifications" => $notifications]);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました。"]);
+        }
+    })->setMiddleware(["auth", "verify"]),
+    "notifications/read" => Route::create("notifications/read", function(): HTTPRenderer {
+
+        try {
+            if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+                throw new Exception("Invalid request method");
+            }
+
+            $notificationId = $_POST["notification_id"];
+            $notificationDao = DAOFactory::getNotificationDAO();
+            $notification = $notificationDao->getNotificationById($notificationId);
+            if ($notification === null) {
+                throw new Exception("無効な通知です。");
+            }
+
+            $authenticatedUser = Authenticate::getAuthenticatedUser();
+            if ($notification->getToUserId() !== $authenticatedUser->getUserId()) {
+                throw new Exception("通知に紐づくユーザーではありません。");
+            }
+
+            $notification->setIsRead(true);
+            $result = $notificationDao->updateIsRead($notification);
+            if (!$result) {
+                throw new Exception("通知確認ステータス更新処理に失敗しました。");
+            }
+
+            return new JSONRenderer(["status" => "success"]);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました。"]);
+        }
+    })->setMiddleware(["auth", "verify"]),
 ];
