@@ -1370,5 +1370,8 @@ return [
             return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました。"]);
         }
     })->setMiddleware(["auth", "verify"]),
-    // 
+    // 通知ページ
+    "notifications" => Route::create("notifications", function(): HTTPRenderer {
+        return new HTMLRenderer("pages/notifications", []);
+    })->setMiddleware(["auth", "verify"]),
 ];
