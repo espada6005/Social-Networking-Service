@@ -9,6 +9,7 @@ use Helpers\MailSender;
 use Helpers\Settings;
 use Helpers\ValidationHelper;
 use Models\Follow;
+use Models\Like;
 use Models\Notification;
 use Models\PasswordResetToken;
 use Models\Post;
@@ -661,7 +662,7 @@ return [
                         "profileImagePath" => $followers[$i]["profile_image_hash"] ?
                             PROFILE_IMAGE_FILE_DIR . $followers[$i]["profile_image_hash"] :
                             PROFILE_IMAGE_FILE_DIR . "default_profile_image.png",
-                        "profilePath" => "/user?un=" . $followers[$i]["username"],
+                        "profilePath" => "/profile?user=" . $followers[$i]["username"],
                         "userType" => $followers[$i]["type"],
                     ];
                 }
@@ -709,7 +710,7 @@ return [
                         "profileImagePath" => $followees[$i]["profile_image_hash"] ?
                             PROFILE_IMAGE_FILE_DIR . $followees[$i]["profile_image_hash"] :
                             PROFILE_IMAGE_FILE_DIR . "default_profile_image.png",
-                        "profilePath" => "/user?un=" . $followees[$i]["username"],
+                        "profilePath" => "/profile?user=" . $followees[$i]["username"],
                         "userType" => $followees[$i]["type"],
                     ];
                 };
@@ -1086,7 +1087,7 @@ return [
             return new JSONRenderer([
                 "status" => "success",
                 "post" => $detailPost,
-                "parentPost" => $parentPost,
+                "parentPost" => $parentPost ?? null,
             ]);
         } catch (Exception $e) {
             error_log($e->getMessage());
@@ -1145,6 +1146,73 @@ return [
             return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました。"]);
         }
     })->setMiddleware(["auth", "verify"]),
+    // ポストいいね
+    "post/like" => Route::create("post/like", function(): HTTPRenderer {
+        $resBody = ["success" => true];
+
+        try {
+            $likeDao = DAOFactory::getLikeDAO();
+            $postDao = DAOFactory::getPostDAO();
+
+            $postId = $_POST["post_id"];
+            $authenticatedUser = Authenticate::getAuthenticatedUser();
+
+            $exists = $likeDao->exists($authenticatedUser->getUserId(), $postId);
+            if ($exists) throw new Exception("既にいいねしています。");
+
+            $post = $postDao->getPostById($postId);
+            if ($post === null) throw new Exception("いいねするポストが存在しません。");
+
+            $like = new Like(
+                user_id: $authenticatedUser->getUserId(),
+                post_id: $post->getPostId(),
+            );
+            $likeDao->create($like);
+
+            if ($authenticatedUser->getUserId() !== $post->getUserId()) {
+                $notification = new Notification(
+                    from_user_id: $authenticatedUser->getUserId(),
+                    to_user_id: $post->getUserId(),
+                    source_id: $post->getPostId(),
+                    type: "LIKE",
+                );
+                $notificationDao = DAOFactory::getNotificationDAO();
+                $result = $notificationDao->create($notification);
+                if (!$result) {
+                    throw new Exception("通知作成処理に失敗しました。");
+                }
+            }
+
+            return new JSONRenderer($resBody);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            $resBody["success"] = false;
+            $resBody["error"] = "エラーが発生しました。";
+            return new JSONRenderer($resBody);
+        }
+    })->setMiddleware(["auth", "verify"]),
+    // ポストいいね解除
+    "post/unlike" => Route::create("post/unlike", function(): HTTPRenderer {
+        $resBody = ["success" => true];
+
+        try {
+            $likeDao = DAOFactory::getLikeDAO();
+            $postId = $_POST["post_id"];
+            $authenticatedUser = Authenticate::getAuthenticatedUser();
+
+            $exists = $likeDao->exists($authenticatedUser->getUserId(), $postId);
+            if (!$exists) throw new Exception("既にいいねされていません。");
+
+            $likeDao->delete($authenticatedUser->getUserId(), $postId);
+
+            return new JSONRenderer($resBody);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            $resBody["success"] = false;
+            $resBody["error"] = "エラーが発生しました。";
+            return new JSONRenderer($resBody);
+        }
+    })->setMiddleware(["auth", "verify"]),
     // 予約ポスト一覧取得
     "post/scheduled_posts/init" => Route::create("/api/post/scheduled_posts", function(): HTTPRenderer {
         try {
@@ -1173,7 +1241,7 @@ return [
                 ];
             }, $scheduledPosts);
 
-            return new JSONRenderer(["status" => "success", "scheduledPosts" => $reservationPosts]);
+            return new JSONRenderer(["status" => "success", "post" => $reservationPosts]);
         } catch (Exception $e) {
             error_log($e->getMessage());
             return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました。"]);
@@ -1290,7 +1358,7 @@ return [
                     "profileImagePath" => $posts[$i]["profile_image_hash"] ?
                         PROFILE_IMAGE_FILE_DIR . $posts[$i]["profile_image_hash"] :
                         PROFILE_IMAGE_FILE_DIR . "default_profile_image.png",
-                    "profilePath" => "/user?un=" . $posts[$i]["username"],
+                    "profilePath" => "/profile?user=" . $posts[$i]["username"],
                     "userType" => $posts[$i]["type"],
                     "deletable" => $authenticatedUser->getUsername() === $posts[$i]["username"],
                 ];
@@ -1302,4 +1370,5 @@ return [
             return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました。"]);
         }
     })->setMiddleware(["auth", "verify"]),
+    // 
 ];
