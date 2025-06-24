@@ -50,14 +50,15 @@ class LikeDAOImpl implements LikeDAO {
 
         $query = <<<QUERY
             SELECT 
-                follow_id,
-                follower_id,
-                followee_id,
+                like_id,
+                user_id,
+                post_id
             FROM 
                 likes
             WHERE 
                 user_id = ?
-                AND post_id = ?
+            AND
+                post_id = ?
             LIMIT 1;
         QUERY;
 
