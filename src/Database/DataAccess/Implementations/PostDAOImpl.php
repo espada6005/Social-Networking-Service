@@ -103,12 +103,12 @@ class PostDAOImpl implements PostDAO {
                 posts.content,
                 posts.image_hash,
                 posts.updated_at,
-                IFNULL(reply_count_table.reply_count, 0),
-                IFNULL(like_count_table.like_count, 0),
+                IFNULL(reply_count_table.reply_count, 0) AS reply_count,
+                IFNULL(like_count_table.like_count, 0) AS like_count,
                 CASE 
                     WHEN liked_table.post_id IS NOT NULL THEN 1 
                     ELSE 0 
-                END,
+                END AS liked,
                 users.name,
                 users.username,
                 users.profile_image_hash,
@@ -157,12 +157,12 @@ class PostDAOImpl implements PostDAO {
                 posts.content,
                 posts.image_hash,
                 posts.updated_at,
-                IFNULL(reply_count_table.reply_count, 0),
-                IFNULL(like_count_table.like_count, 0),
+                IFNULL(reply_count_table.reply_count, 0) AS reply_count,
+                IFNULL(like_count_table.like_count, 0) AS like_count,
                 CASE 
                     WHEN liked_table.post_id IS NOT NULL THEN 1 
                     ELSE 0 
-                END,
+                END AS liked,
                 users.name,
                 users.username,
                 users.profile_image_hash,
@@ -220,12 +220,12 @@ class PostDAOImpl implements PostDAO {
                 posts.content,
                 posts.image_hash,
                 posts.updated_at,
-                IFNULL(reply_count_table.reply_count, 0),
-                IFNULL(like_count_table.like_count, 0),
+                IFNULL(reply_count_table.reply_count, 0) AS reply_count,
+                IFNULL(like_count_table.like_count, 0) AS like_count,
                 CASE 
                     WHEN liked_table.post_id IS NOT NULL THEN 1 
                     ELSE 0 
-                END,
+                END AS liked,
                 users.name,
                 users.username,
                 users.profile_image_hash,
@@ -285,12 +285,12 @@ class PostDAOImpl implements PostDAO {
                 posts.content,
                 posts.image_hash,
                 posts.updated_at,
-                IFNULL(reply_count_table.reply_count, 0),
-                IFNULL(like_count_table.like_count, 0),
+                IFNULL(reply_count_table.reply_count, 0) AS reply_count,
+                IFNULL(like_count_table.like_count, 0) AS like_count,
                 CASE 
                     WHEN liked_table.post_id IS NOT NULL THEN 1 
                     ELSE 0 
-                END,
+                END AS liked,
                 users.name,
                 users.username,
                 users.profile_image_hash,
@@ -351,12 +351,12 @@ class PostDAOImpl implements PostDAO {
                 posts.content,
                 posts.image_hash,
                 posts.updated_at,
-                IFNULL(reply_count_table.reply_count, 0),
-                IFNULL(like_count_table.like_count, 0),
+                IFNULL(reply_count_table.reply_count, 0) AS reply_count,
+                IFNULL(like_count_table.like_count, 0) AS like_count,
                 CASE 
                     WHEN liked_table.post_id IS NOT NULL THEN 1 
                     ELSE 0 
-                END,
+                END AS liked,
                 users.name,
                 users.username,
                 users.profile_image_hash,
@@ -415,12 +415,12 @@ class PostDAOImpl implements PostDAO {
                 posts.content,
                 posts.image_hash,
                 posts.updated_at,
-                IFNULL(reply_count_table.reply_count, 0),
-                IFNULL(like_count_table.like_count, 0),
+                IFNULL(reply_count_table.reply_count, 0) AS reply_count,
+                IFNULL(like_count_table.like_count, 0) AS like_count,
                 CASE 
                     WHEN liked_table.post_id IS NOT NULL THEN 1 
                     ELSE 0 
-                END,
+                END AS liked,
                 users.name,
                 users.username,
                 users.profile_image_hash,
@@ -504,12 +504,12 @@ class PostDAOImpl implements PostDAO {
                 posts.content,
                 posts.image_hash,
                 posts.updated_at,
-                IFNULL(reply_count_table.reply_count, 0),
-                IFNULL(like_count_table.like_count, 0),
+                IFNULL(reply_count_table.reply_count, 0) AS reply_count,
+                IFNULL(like_count_table.like_count, 0) AS like_count,
                 CASE 
                     WHEN liked_table.post_id IS NOT NULL THEN 1 
                     ELSE 0 
-                END,
+                END AS liked,
                 users.name,
                 users.username,
                 users.profile_image_hash,
