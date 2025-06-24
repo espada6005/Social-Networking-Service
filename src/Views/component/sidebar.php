@@ -10,7 +10,7 @@
                     </a>
                 </li>
                 <li class="nav-item mb-2 position-relative">
-                    <a href="#" class="nav-link p-1 d-flex align-items-center text-light">
+                    <a href="/notifications" class="nav-link p-1 d-flex align-items-center text-light">
                         <ion-icon name="notifications-outline"></ion-icon>
                         <span class="fs-5 ms-2 d-none d-sm-inline">通知</span>
                     </a>
@@ -22,7 +22,7 @@
                     <?php endif; ?>
                 </li>
                 <li class="nav-item mb-2">
-                    <a href="/#" class="nav-link p-1 d-flex align-items-center text-light">
+                    <a href="/messages" class="nav-link p-1 d-flex align-items-center text-light">
                         <ion-icon name="mail-outline"></ion-icon>
                         <span class="fs-5 ms-2 d-none d-sm-inline">メッセージ</span>
                     </a>
