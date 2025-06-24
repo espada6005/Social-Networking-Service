@@ -49,12 +49,25 @@ class DateTimeHelper {
         }
     }
 
+    public static function stringToDatetime(string $dateTimeString): DateTime {
+        return new DateTime($dateTimeString, self::getTimezone());
+    }
+
+    public static function formatJpDateTime(DateTime $datetime): string {
+        return $datetime->setTimezone(self::getTimezone())->format("Y年n月j日 G時i分");
+    }
+
     public static function getCurrentDateTime(): DateTime {
         return new DateTime("now", self::getTimeZone());
     }
 
     public static function formatDateTime(DateTime $dateTime): string {
         return $dateTime->setTimezone(self::getTimeZone())->format("Y-m-d H:i:s");
+    }
+
+    public static function getCurrentHour(): int {
+        $now = self::getCurrentDateTime();
+        return (int) $now->format("G");
     }
 
 }
