@@ -2,6 +2,7 @@
 
 namespace Response\Render;
 
+use Database\DataAccess\DAOFactory;
 use Helpers\Authenticate;
 use Response\HTTPRenderer;
 
@@ -37,6 +38,12 @@ class HTMLRenderer implements HTTPRenderer {
     private function getHeader(): string {
         ob_start();
         $user = Authenticate::getAuthenticatedUser();
+
+        $notificationCount = 0;
+        if ($user !== null) {
+            $notificationCount = DAOFactory::getNotificationDAO()->getUserUnreadNotificationCount($user->getUserId());
+        }
+
         require $this->getViewPath("layout/header");
         require $this->getViewPath("component/post_modal");
         require $this->getViewPath("component/reply_modal");
