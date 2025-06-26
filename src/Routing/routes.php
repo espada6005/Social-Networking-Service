@@ -4,6 +4,7 @@ use Database\DataAccess\DAOFactory;
 use Exceptions\AuthenticationFailureException;
 use Helpers\Authenticate;
 use Helpers\DateTimeHelper;
+use Helpers\Encryptor;
 use Helpers\ImageHelper;
 use Helpers\MailSender;
 use Helpers\Settings;
@@ -1450,5 +1451,13 @@ return [
             error_log($e->getMessage());
             return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました。"]);
         }
+    })->setMiddleware(["auth", "verify"]),
+    // メッセージページ
+    "messages" => Route::create("/messages", function(): HTTPRenderer {
+        return new HTMLRenderer("pages/messages_users", []);
+    })->setMiddleware(["auth", "verify"]),
+    // チャットページ
+    "messages/chat" => Route::create("messages/chat", function(): HTTPRenderer {
+        return new HTMLRenderer("pages/chat", []);
     })->setMiddleware(["auth", "verify"]),
 ];
