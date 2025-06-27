@@ -9,7 +9,8 @@
             "Models\\": "src/Models/",
             "Response\\": "src/Response/",
             "Routing\\": "src/Routing/",
-            "Types\\": "src/Types/"
+            "Types\\": "src/Types/",
+            "WebSocket\\": "src/WebSocket/"
 		}
     },
     "require": {
