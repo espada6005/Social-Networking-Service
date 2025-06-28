@@ -1454,10 +1454,151 @@ return [
     })->setMiddleware(["auth", "verify"]),
     // メッセージページ
     "messages" => Route::create("/messages", function(): HTTPRenderer {
-        return new HTMLRenderer("pages/messages_users", []);
+        return new HTMLRenderer("pages/chat_users", []);
     })->setMiddleware(["auth", "verify"]),
     // チャットページ
     "messages/chat" => Route::create("messages/chat", function(): HTTPRenderer {
         return new HTMLRenderer("pages/chat", []);
+    })->setMiddleware(["auth", "verify"]),
+    // メッセージユーザー一覧取得
+    "messages/users" => Route::create("/messages/users", function(): HTTPRenderer {
+        try {
+            if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+                throw new Exception("Invalid request method");
+            }
+
+            $authenticatedUser = Authenticate::getAuthenticatedUser();
+
+            $messageDao = DAOFactory::getMessageDAO();
+
+            $limit = $_POST["limit"] ?? 30;
+            $offset = $_POST["offset"] ?? 0;
+            $chatUsers = $messageDao->getChatUsers($authenticatedUser->getUserId(), $limit, $offset);
+
+            for ($i = 0; $i < count($chatUsers); $i++) {
+                $chatUsers[$i] = [
+                    "name" => $chatUsers[$i]["name"],
+                    "username" => $chatUsers[$i]["username"],
+                    "profileImagePath" => $chatUsers[$i]["profile_image_hash"] ?
+                        PROFILE_IMAGE_FILE_DIR . $chatUsers[$i]["profile_image_hash"] :
+                        PROFILE_IMAGE_FILE_DIR . "default_profile_image.png",
+                    "chatPath" => "/messages/chat?user=" . $chatUsers[$i]["username"],
+                    "userType" => $chatUsers[$i]["type"],
+                ];
+            }
+
+            return new JSONRenderer(["status" => "success", "chatUsers" => $chatUsers]);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました。"]);
+        }
+    })->setMiddleware(["auth", "verify"]),
+    // 対象ユーザーを取得
+    "messages/chat/user" => Route::create("/messages/chat/user", function(): HTTPRenderer {
+        try {
+            if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+                throw new Exception("Invalid request method");
+            }
+
+            $username = $_POST["user"];
+            if ($username === null) {
+                throw new Exception("リクエストデータが不適切です。");
+            }
+
+            $userDao = DAOFactory::getUserDAO();
+            $user = $userDao->getByUsername($username);
+            if ($user === null) {
+                throw new Exception("ユーザーが存在しません。");
+            }
+
+            $authenticatedUser = Authenticate::getAuthenticatedUser();
+            if ($user->getUserId() === $authenticatedUser->getUserId()) {
+                throw new Exception("不適切なユーザーです。");
+            }
+
+            $userData = [
+                "name" => $user->getName(),
+                "profileImagePath" => $user->getProfileImageHash() ?
+                    PROFILE_IMAGE_FILE_DIR . $user->getProfileImageHash() :
+                    PROFILE_IMAGE_FILE_DIR . "default_profile_image.png",
+                "profilePath" => "/profile?user=" . $user->getUsername(),
+            ];
+
+            return new JSONRenderer(["status" => "success", "userData" => $userData]);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました。"]);
+        }
+    })->setMiddleware(["auth", "verify"]),
+    // メッセージを取得
+    "messages/chat/messages" => Route::create("/messages/chat/messages", function(): HTTPRenderer {
+        try {
+            if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+                throw new Exception("Invalid request method");
+            }
+
+            $username = $_POST["user"];
+            if ($username === null) {
+                throw new Exception("リクエストデータが不適切です。");
+            }
+
+            $userDao = DAOFactory::getUserDAO();
+            $user = $userDao->getByUsername($username);
+            if ($user === null) {
+                throw new Exception("ユーザーが存在しません。");
+            }
+
+            $authenticatedUser = Authenticate::getAuthenticatedUser();
+            if ($user->getUserId() === $authenticatedUser->getUserId()) {
+                throw new Exception("不適切なユーザーです。");
+            }
+
+            $messageDao = DAOFactory::getMessageDAO();
+            $messages = $messageDao->getChatMessages(
+                $authenticatedUser->getUserId(),
+                $user->getUserId(),
+                $_POST["limit"] ?? 30,
+                $_POST["offset"] ?? 0,
+            );
+
+            for ($i = 0; $i < count($messages); $i++) {
+                $messages[$i] = [
+                    "content" => Encryptor::decrypt($messages[$i]["content"]),
+                    "isMyMessage" => $messages[$i]["from_user_id"] === $authenticatedUser->getUserId(),
+                ];
+            }
+
+            return new JSONRenderer(["status" => "success", "messages" => $messages]);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました。"]);
+        }
+    })->setMiddleware(["auth", "verify"]),
+    // メッセージトークンの生成
+    "messages/chat/token" => Route::create("/api/messages/chat/token", function(): HTTPRenderer {
+        try {
+            if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+                throw new Exception("Invalid request method");
+            }
+
+            $tun = $_POST["user"];
+            $authenticatedUser = Authenticate::getAuthenticatedUser();
+            $fun = $authenticatedUser->getUsername();
+            $token = hash_hmac("sha256", $fun . $tun, Settings::env("SECRET_KEY"));
+
+            $resBody["fun"] = $fun;
+            $resBody["tun"] = $tun;
+            $resBody["token"] = $token;
+
+            return new JSONRenderer([
+                "status" => "success",
+                "fun" => $fun,
+                "tun" => $tun,
+                "token" => $token,
+            ]);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました。"]);
+        }
     })->setMiddleware(["auth", "verify"]),
 ];
