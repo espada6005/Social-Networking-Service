@@ -1,0 +1,23 @@
+<?php
+
+require "vendor/autoload.php";
+
+use Ratchet\Server\IoServer;
+use Ratchet\Http\HttpServer;
+use Ratchet\WebSocket\WsServer;
+use WebSocket\Chat;
+
+$port = 8080;
+
+$server = IoServer::factory(
+    new HttpServer(
+        new WsServer(
+            new Chat
+        )
+    ),
+    $port
+);
+
+error_log("WebSocket server started on port {$port}");
+
+$server->run();
