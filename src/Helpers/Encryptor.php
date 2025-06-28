@@ -1,4 +1,5 @@
-<<?php
+<?php
+
 namespace Helpers;
 
 class Encryptor {
