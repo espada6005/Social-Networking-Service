@@ -3,7 +3,6 @@
 namespace Commands\Programs;
 
 use Commands\AbstractCommand;
-use Commands\Argument;
 use Database\MySQLWrapper;
 use Database\SchemaSeeder;
 
@@ -12,44 +11,21 @@ class Seed extends AbstractCommand {
     protected static ?string $alias = "seed";
 
     public static function getArguments(): array {
-        return [
-            // TODO: descriptionの修正
-            (new Argument("init"))->description("Execute initial data seeding.")->required(false)->allowAsShort(true),
-            (new Argument("batch"))->description("Execute periodic data seeding.")->required(false)->allowAsShort(true),
-        ];
+        return [];
     }
 
     public function execute(): int {
         $this->log("Starting data seeding...");
-
-        $init = $this->getArgumentValue("init");
-        $batch = $this->getArgumentValue("batch");
-
-        $seedFiles = [];
-        if ($init) {
-            $seedFiles = [
-                "UserInitSeeder.php",
-            ];
-        } else if ($batch) {
-            $seedFiles = [
-                
-            ];
-        }
-
-        $this->runAllSeeds($seedFiles);
-
+        $this->runAllSeeds();
         $this->log("Data seeding completed successfully.");
         return 0;
     }
 
-    function runAllSeeds(?array $seedFiles): void {
+    function runAllSeeds(): void {
         $directoryPath = __DIR__ . "/../../Database/Seeds";
 
         // ディレクトリをスキャンしてすべてのファイルを取得
-        $files = $seedFiles;
-        if ($files === null || count($files) === 0) {
-            $files = scandir($directoryPath);
-        }
+        $files = scandir($directoryPath);
 
         foreach ($files as $file) {
             if (pathinfo($file, PATHINFO_EXTENSION) === "php") {
