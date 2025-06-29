@@ -1226,9 +1226,9 @@ return [
 
             $authenticatedUser = Authenticate::getAuthenticatedUser();
             $postDao = DAOFactory::getPostDAO();
-            $scheduledPosts = $postDao->getScheduledPosts($authenticatedUser->getUserId(), $limit, $offset);
+            $rawScheduledPosts = $postDao->getScheduledPosts($authenticatedUser->getUserId(), $limit, $offset);
 
-            $reservationPosts = array_map(function($post) {
+            $scheduledPosts = array_map(function($post) {
                 return [
                     "postId" => $post["post_id"],
                     "content" => $post["content"],
@@ -1240,9 +1240,9 @@ return [
                         "",
                     "scheduledAt" => DateTimeHelper::formatJpDateTime(DateTimeHelper::stringToDatetime($post["scheduled_at"])),
                 ];
-            }, $scheduledPosts);
+            }, $rawScheduledPosts);
 
-            return new JSONRenderer(["status" => "success", "post" => $reservationPosts]);
+            return new JSONRenderer(["status" => "success", "scheduledPosts" => $scheduledPosts]);
         } catch (Exception $e) {
             error_log($e->getMessage());
             return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました。"]);
