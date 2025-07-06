@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         if (user.isLoggedInUser) {
             editBtn.classList.remove("d-none");
         } else {
-            messageBtn.href = `/messages/chat?un=${user.username}`;
+            messageBtn.href = `/messages/chat?user=${user.username}`;
             messageBtn.classList.remove("d-none");
 
             if (user.isFollowee) {
