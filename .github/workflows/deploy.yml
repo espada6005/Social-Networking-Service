@@ -51,7 +51,7 @@ jobs:
         run: |
 
           # セキュリティグループを開放
-          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.EC2_SECURITY_GROUP_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+          aws ec2 authorize-security-group-ingress  --region ap-northeast-3 --group-id ${{ secrets.EC2_SECURITY_GROUP_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
 
           # SSH接続してgit pull
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
@@ -59,4 +59,4 @@ jobs:
           ssh -oStrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} -i private_key "cd ~/webapp/Social-Networking-Service && git pull origin main"
 
           # SSHのセキュリティグループを閉鎖
-          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.EC2_SECURITY_GROUP_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+          aws ec2 revoke-security-group-ingress --region ap-northeast-3 --group-id ${{ secrets.EC2_SECURITY_GROUP_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
