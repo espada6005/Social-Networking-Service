@@ -2,65 +2,58 @@ name: Deploy to Production
 
 # mainブランチにpushされたら走る
 on:
- push:
-   branches: [ main ]
+    push:
+        branches: [ main ]
 
-# mainブランチへのプルリクエストがclosedしたら走る設定は以下
-# on:
-#  pull_request:
-#    branches: [ main ]
-#    types: [closed]
-
- workflow_dispatch:
+    workflow_dispatch:
 
 jobs:
-  build:
-    #GitHub Actionsの実行環境
-    runs-on: ubuntu-latest
-    steps:
+    build:
+        #GitHub Actionsの実行環境
+        runs-on: ubuntu-latest
+        steps:
 
-      # セキュリティグループにIPアドレスを登録するためにIPアドレス取得ライブラリを使用
-      # GitHub Actionsの実行環境のIPアドレスは固定ではないため
-      - name: Public IP Install
-        id: ip
-        uses: haythem/public-ip@v1.3
+        # セキュリティグループにIPアドレスを登録するためにIPアドレス取得ライブラリを使用
+        # GitHub Actionsの実行環境のIPアドレスは固定ではないため
+        - name: Public IP Install
+          id: ip
+          uses: haythem/public-ip@v1.3
 
-      # actions/checkout@v2は、GitHubリポジトリの最新のコードをチェックアウトして取得するための標準アクション
-      - name: Checkout
-        uses: actions/checkout@v2
+        # actions/checkout@v2は、GitHubリポジトリの最新のコードをチェックアウトして取得するための標準アクション
+        - name: Checkout
+          uses: actions/checkout@v2
 
-      # AWS CLIをインストール
-      - name: AWS CLI install
-        run: |
-          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-          unzip awscliv2.zip
-          sudo ./aws/install --update
-          aws --version
+        # AWS CLIをインストール
+        - name: AWS CLI install
+          run: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install --update
+            aws --version
 
-      # AWS CLIにキーを設定
-      # ${{ secrets.XXX_XXX_XXX }}はGitHubに登録したSecretのName
-      - name: AWS set Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-northeast-3
+        # AWS CLIにキーを設定
+        # ${{ secrets.XXX_XXX_XXX }}はGitHubに登録したSecretのName
+        - name: AWS set Credentials
+          uses: aws-actions/configure-aws-credentials@v1
+          with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: ap-northeast-3
 
-     # デプロイ
-      - name: Deploy
-        run: |
+        # デプロイ
+        - name: Deploy
+          run: |
+            # セキュリティグループを開放
+            aws ec2 authorize-security-group-ingress --group-id ${{ secrets.EC2_SECURITY_GROUP_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
 
-          # セキュリティグループを開放
-          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.EC2_SECURITY_GROUP_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+            # SSH接続してgit pull
+            echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
+            chmod 600 private_key
+            ssh -oStrictHostKeyChecking=no -i private_key ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            cd ~/webapp/Social-Networking-Service
+            git pull origin main
+            composer install --no-dev --optimize-autoloader
+            EOF
 
-          # SSH接続してgit pull
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
-          chmod 600 private_key
-          ssh -oStrictHostKeyChecking=no -i private_key ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-          cd ~/webapp/Social-Networking-Service
-          git pull origin main
-          composer install --no-dev --optimize-autoloader
-          EOF
-
-          # SSHのセキュリティグループを閉鎖
-          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.EC2_SECURITY_GROUP_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+            # SSHのセキュリティグループを閉鎖
+            aws ec2 revoke-security-group-ingress --group-id ${{ secrets.EC2_SECURITY_GROUP_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
