@@ -11,9 +11,8 @@
     $current_page = basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
     if ($current_page === "") {
         echo "<link rel='stylesheet' href='/css/top.css'>";
-    } else {
-        echo "<link rel='stylesheet' href='/css/{$current_page}.css'>";
-    }
+    } 
+    
     ?>
     <script src="/js/common.js"></script>
     <?php if ($user !== null): ?>
