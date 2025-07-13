@@ -32,7 +32,6 @@ jobs:
             aws --version
 
         # AWS CLIにキーを設定
-        # ${{ secrets.XXX_XXX_XXX }}はGitHubに登録したSecretのName
         - name: AWS set Credentials
           uses: aws-actions/configure-aws-credentials@v1
           with:
@@ -54,6 +53,7 @@ jobs:
             git pull origin main
             composer install --no-dev --optimize-autoloader
             EOF
+            rm private_key
 
             # SSHのセキュリティグループを閉鎖
             aws ec2 revoke-security-group-ingress --group-id ${{ secrets.EC2_SECURITY_GROUP_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
