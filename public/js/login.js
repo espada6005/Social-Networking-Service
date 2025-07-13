@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", async function() {
 
     loginForm.addEventListener("submit", async function(event) {
         event.preventDefault();
+        resetFormValidations();
 
         const formData = new FormData(loginForm);
         const responseJson = await sendPostRequest("/form/login", formData);
@@ -13,7 +14,9 @@ document.addEventListener("DOMContentLoaded", async function() {
         }
 
         if (responseJson.status === "fieldErrors") {
-            alert("入力に問題があります");
+            for (let field in responseJson.message) {
+                setFormValidation(field, responseJson.message[field]);
+            }
         }
 
         if (responseJson.status === "success") {
@@ -23,5 +26,6 @@ document.addEventListener("DOMContentLoaded", async function() {
         if (responseJson.status === "error") {
             alert(responseJson.message);
         }
+        
     });
 });
