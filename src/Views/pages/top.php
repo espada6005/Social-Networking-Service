@@ -22,10 +22,12 @@
                     <div class="mb-3">
                         <label for="login-email" class="form-label">メールアドレス</label>
                         <input type="text" class="form-control" id="login-email" name="email">
+                        <div id="login-email-error-msg" class="invalid-feedback"></div>
                     </div>
                     <div class="mb-3">
                         <label for="login-password" class="form-label">パスワード</label>
                         <input type="password" class="form-control" id="login-password" name="password">
+                        <div id="login-password-error-msg" class="invalid-feedback"></div>
                     </div>
                     <button type="submit" class="btn btn-primary w-100" id="login-btn">ログイン</button>
                     <div class="text-center mt-2">
@@ -40,24 +42,29 @@
                 <form action="post" id="register-form">
                     <input type="hidden" name="csrf_token" value="<?= Helpers\CrossSiteForgeryProtection::getToken(); ?>">
                     <div class="mb-3">
-                        <label for="register-name" class="form-label">名前</label>
-                        <input type="text" class="form-control" id="register-name" name="name">
+                        <label for="name" class="form-label">名前</label>
+                        <input type="text" class="form-control" id="name" name="name">
+                        <div id="name-error-msg" class="invalid-feedback"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="register-username" class="form-label">ユーザー名</label>
-                        <input type="text" class="form-control" id="register-username" name="username">
+                        <label for="username" class="form-label">ユーザー名</label>
+                        <input type="text" class="form-control" id="username" name="username">
+                        <div id="username-error-msg" class="invalid-feedback"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="register-email" class="form-label">メールアドレス</label>
-                        <input type="email" class="form-control" id="register-email" name="email">
+                        <label for="email" class="form-label">メールアドレス</label>
+                        <input type="email" class="form-control" id="email" name="email">
+                        <div id="email-error-msg" class="invalid-feedback"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="register-password" class="form-label">パスワード</label>
-                        <input type="password" class="form-control" id="register-password" name="password">
+                        <label for="password" class="form-label">パスワード</label>
+                        <input type="password" class="form-control" id="password" name="password">
+                        <div id="password-error-msg" class="invalid-feedback"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="register-confirm-password" class="form-label">パスワード確認用</label>
-                        <input type="password" class="form-control" id="register-confirm-password" name="confirm-password">
+                        <label for="confirm-password" class="form-label">パスワード確認用</label>
+                        <input type="password" class="form-control" id="confirm-password" name="confirm-password">
+                        <div id="confirm-password-error-msg" class="invalid-feedback"></div>
                     </div>
                     <button type="submit" class="btn btn-primary w-100" id="register-btn">登録</button>
                 </form>
