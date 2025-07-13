@@ -65,6 +65,14 @@ return [
             ], $_POST);
 
             if (!empty($fieldErrors)) {
+                if (array_key_exists("email", $fieldErrors)) {
+                    $fieldErrors["login-email"] = $fieldErrors["email"];
+                    unset($fieldErrors["email"]);
+                }
+                if (array_key_exists("password", $fieldErrors)) {
+                    $fieldErrors["login-password"] = $fieldErrors["password"];
+                    unset($fieldErrors["password"]);
+                }
                 return new JSONRenderer(["status" => "fieldErrors", "message" => $fieldErrors]);
             }
 
@@ -75,7 +83,8 @@ return [
         } catch (AuthenticationFailureException $e) {
             return new JSONRenderer(["status" => "error", "message" => $e->getMessage()]);
         } catch (\Exception $e) {
-            return new JSONRenderer(["status" => "error", "message" => $e->getMessage()]);
+            error_log($e->getMessage());
+            return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました"]);
         }
     })->setMiddleware(["guest"]),
     // ログアウト
