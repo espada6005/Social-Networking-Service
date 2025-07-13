@@ -51,7 +51,7 @@ class Authenticate {
         self::$authenticatedUser = $userDAO->getByEmail($email);
 
         if (self::$authenticatedUser === null) {
-            throw new Exception("Could not retrieve user by specified email %s " . $email);
+            throw new AuthenticationFailureException("{$email}は登録されていません");
         }
 
         $hashedPassword = $userDAO->getHashedPasswordById(self::$authenticatedUser->getUserId());
@@ -60,7 +60,7 @@ class Authenticate {
             self::loginAsUser(self::$authenticatedUser);
             return self::$authenticatedUser;
         } else {
-            throw new AuthenticationFailureException("Invalid password.");
+            throw new AuthenticationFailureException("パスワードが間違っています");
         }
         
     }
