@@ -48,7 +48,12 @@ jobs:
             # SSH接続してgit pull
             echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
             chmod 600 private_key
-            ssh -v -oStrictHostKeyChecking=no -i private_key ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}
+            ssh -oStrictHostKeyChecking=no -i private_key ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            set -e
+            cd ~/webapp/Social-Networking-Service
+            git pull origin main
+            composer install --no-dev --optimize-autoloader
+            EOF
             rm private_key
 
             # SSHのセキュリティグループを閉鎖
