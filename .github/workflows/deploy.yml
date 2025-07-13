@@ -51,7 +51,7 @@ jobs:
             ssh -oStrictHostKeyChecking=no -i private_key ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             set -e
             eval "$(ssh-agent -s)"
-            ssh-add ~/.ssh/id_ed25519
+            ssh-add ~/.ssh/id_ed25519_auto_deploy
             cd ~/webapp/Social-Networking-Service
             git pull origin main
             composer install --no-dev --optimize-autoloader
