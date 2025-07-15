@@ -20,14 +20,14 @@ async function resetFormValidations() {
 }
 
 async function resetFormValidation(fieldId) {
-    const invalidInput = document.getElementById(fieldId);
+    const invalidInput = document.querySelector(`#${fieldId}`);
     invalidInput.classList.remove("is-invalid");
 }
 
 async function setFormValidation(fieldId, message) {
-    const field = document.getElementById(fieldId);
+    const field = document.querySelector(`#${fieldId}`);
     field.classList.add("is-invalid");
-    const errorMsg = document.getElementById(`${fieldId}-error-msg`);
+    const errorMsg = document.querySelector(`#${fieldId}-error-msg`);
     errorMsg.innerText = message;
 }
 
@@ -183,7 +183,7 @@ function createPostEl(post, parent) {
         event.preventDefault();
         event.stopPropagation();
 
-        const replyToIdInput = document.getElementById("reply-to-id");
+        const replyToIdInput = document.querySelector("#reply-to-id");
         replyToIdInput.value = post.postId;
     });
 
