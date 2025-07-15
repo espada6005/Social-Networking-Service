@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", async function() {
 
     registerForm.addEventListener("submit", async function(event) {
         event.preventDefault();
+        resetFormValidations();
 
         const formData = new FormData(registerForm);
         const responseJson = await sendPostRequest("/form/user/register", formData);
@@ -13,8 +14,9 @@ document.addEventListener("DOMContentLoaded", async function() {
         }
 
         if (responseJson.status === "fieldErrors") {
-            alert("入力に問題があります");
-            console.log(JSON.stringify(responseJson, null, 2));
+            for (let field in responseJson.message) {
+                setFormValidation(field, responseJson.message[field]);
+            }
         }
 
         if (responseJson.status === "success") {
