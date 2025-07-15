@@ -109,6 +109,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     customRadio.addEventListener("change", toggleUploadBlock);
     defaultRadio.addEventListener("change", toggleUploadBlock);
 
+    /**
+   * プロフィール編集モーダル
+   * ファイルinput値変更時の処理
+   */
     const profileImageInput = document.querySelector("#profile-image");
     profileImageInput.addEventListener("change", function (event) {
         const file = event.target.files[0]; // アップロードされたファイルを取得
@@ -126,7 +130,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             reader.readAsDataURL(file); // ファイルをデータURLとして読み込む
         }
     });
-
 
     /**
      * プロフィール編集モーダル
