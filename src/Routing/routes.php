@@ -406,6 +406,7 @@ return [
             $passwordResetDao = DAOFactory::getPasswordResetDAO();
             $passwordResetDao->deleteByUserId($_POST["user_id"]);
 
+            FlashData::setFlashData("success", "パスワードが更新されました");
             return new JSONRenderer(["status" => "success", "redirectUrl" => "/"]);
         } catch (\Exception $e) {
             error_log($e->getMessage());
