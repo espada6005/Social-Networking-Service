@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     forgotForm.addEventListener("submit", async function (event) {
         event.preventDefault();
+        resetFormValidations();
 
         const formData = new FormData(forgotForm);
         const responseJson = await sendPostRequest("/form/password/forgot", formData);
