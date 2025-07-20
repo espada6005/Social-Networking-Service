@@ -490,14 +490,14 @@ return [
                 if ($fileError === UPLOAD_ERR_OK) {
                     if (!ValidationHelper::validateImageType($_FILES["profile-image"]["type"])) {
                         $fieldErrors["profile-image"] =
-                            "ファイル形式が不適切です。JPG, JPEG, PNG, GIFのファイルが設定可能です。";
+                            "JPG, JPEG, PNG, GIF形式の画像をアップロードしてください";
                     } else if (!ValidationHelper::validateImageSize($_FILES["profile-image"]["size"])) {
                         $fieldErrors["profile-image"] =
-                            "ファイルが大きすぎます。";
+                            "ファイルサイズが大きすぎます";
                     }
                 } else if ($fileError !== UPLOAD_ERR_NO_FILE) {
                     $fieldErrors["profile-image"] =
-                        "ファイルサイズ等の問題によりこの画像は設定できません。";
+                        "画像のアップロードに失敗しました";
                 }
             }
 
@@ -756,17 +756,17 @@ return [
             if ($postImageUploaded) {
                 if (!ValidationHelper::validateImageType($_FILES["post-image"]["type"])) {
                     $fieldErrors["post-image"] =
-                        "ファイル形式が不適切です。JPG, JPEG, PNG, GIFのファイルが設定可能です。";
+                        "JPG, JPEG, PNG, GIF形式の画像をアップロードしてください";
                 } else if (!ValidationHelper::validateImageSize($_FILES["post-image"]["size"])) {
                     $fieldErrors["post-image"] =
-                        "ファイルが大きすぎます。";
+                        "ファイルサイズが大きすぎます";
                 }
             }
 
             if ($_POST["type"] === "schedule") {
                 if ($_POST["post-scheduled-at"] === null || !ValidationHelper::validateDateTime($_POST["post-scheduled-at"])) {
                     $fieldErrors["post-scheduled-at"] =
-                        "日付を正しく設定してください。";
+                        "YYYY/MM/DD HH:MM 形式で入力してください";
                 }
             }
 
