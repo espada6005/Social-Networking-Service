@@ -13,7 +13,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
 
         if (responseJson.status === "fieldErrors") {
-            console.log(JSON.stringify(responseJson, null, 2));
+            for (let field in responseJson.message) {
+                setFormValidation(field, responseJson.message[field]);
+            }
         }
 
         if (responseJson.status === "success") {
