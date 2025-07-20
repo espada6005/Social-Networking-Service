@@ -105,7 +105,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         } else {
             if (responseJson.status === "fieldErrors") {
                 for (const field in responseJson.message) {
-                    setFormValidation(field, responseJson.fieldErrors[field]);
+                    setFormValidation(field, responseJson.message[field]);
                 }
             }
             if (responseJson.status === "error") {
