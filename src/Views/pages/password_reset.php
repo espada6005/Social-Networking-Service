@@ -8,9 +8,9 @@
                     <input type="hidden" name="user_id" value="<?= $userId ?>">
                     <div class="mb-3">
                         <label for="password" class="form-label">新しいパスワード</label>
+                        <span class="form-text m-0 ms-2">(8〜30文字 + 大文字/小文字/数字/記号 必須)</span>
                         <input type="password" class="form-control" id="password" name="password" required>
                         <div id="password-error-msg" class="invalid-feedback"></div>
-                        <span class="form-text m-0 ms-2">(8〜30文字 + 大文字/小文字/数字/記号 必須)</span>
                     </div>
                     <div class="mb-3">
                         <label for="confirm-password" class="form-label">パスワード（確認）</label>
