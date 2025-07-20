@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     forgotForm.addEventListener("submit", async function (event) {
         event.preventDefault();
+        resetFormValidations();
 
         const formData = new FormData(forgotForm);
         const responseJson = await sendPostRequest("/form/password/reset", formData);
@@ -13,7 +14,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
 
         if (responseJson.status === "fieldErrors") {
-            console.log(JSON.stringify(responseJson, null, 2));
+            for (let field in responseJson.message) {
+                setFormValidation(field, responseJson.message[field]);
+            }
         }
 
         if (responseJson.status === "success") {
@@ -21,7 +24,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
 
         if (responseJson.status === "error") {
-            console.error(responseJson.message);
+            alert(responseJson.message);
         }
     });
 });
