@@ -14,7 +14,7 @@
     <div id="profile-block" class="d-none">
         <div class="d-flex justify-content-between align-items-center mb-2">
             <a id="profile-image-link" href="" target="_blank" rel="noopener noreferrer">
-                <img id="profile-image" src="" alt="プロフィール画像" width="90" height="90" class="rounded-circle border">
+                <img id="profile-image-area" src="" alt="プロフィール画像" width="90" height="90" class="rounded-circle border">
             </a>
             <div class="d-flex align-items-center gap-2">
                 <a id="message-btn" class="p-1 rounded-circle border border-primary d-flex justify-content-center align-items-center d-none" style="width: 32px; height: 32px;">
@@ -34,7 +34,7 @@
             <p id="follower-label" class="m-0 text-secondary fw-light d-none">
                 <small class="bg-light p-1 rounded">フォローされています</small>
             </p>
-            <p id="profile-text" class="mt-2"></p>
+            <p id="profile-text-area" class="mt-2"></p>
             <div class="d-block d-sm-flex gap-3">
                 <a id="followee-link" class="mb-1 d-block text-black">フォロー <span id="followee-count"></span></a>
                 <a id="follower-link" class="mb-1 d-block text-black">フォロワー <span id="follower-count"></span></a>
