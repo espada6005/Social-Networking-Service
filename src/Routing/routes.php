@@ -39,7 +39,7 @@ return [
             $guestUser = $userDao->getGuestUser();
 
             if (!$guestUser === null) {
-                throw new Exception("ゲストユーザーが取得できませんでした");
+                throw new Exception("failed to get guest user");
             }
             // ゲストユーザーとしてログイン
             Authenticate::loginAsUser($guestUser);
@@ -48,7 +48,7 @@ return [
         } catch (\Exception $e) {
             error_log($e->getMessage());
             FlashData::setFlashData("error", "ゲストログインに失敗しました");
-            return new RedirectRenderer("/");
+            return new RedirectRenderer("");
         }
     })->setMiddleware(["guest"]),
     // ログイン
@@ -246,6 +246,7 @@ return [
                 return new JSONRenderer(["status" => "error", "message" => "メールの送信に失敗しました"]);
             }
 
+            FlashData::setFlashData("success", "検証メールを再送信しました");
             return new JSONRenderer(["status" => "success", "redirectUrl" => "/verify/resend"]);
         } catch (\Exception $e) {
             error_log($e->getMessage());
@@ -342,7 +343,8 @@ return [
                 return new JSONRenderer(["status" => "error", "message" => "パスワードリセットトークンの保存に失敗しました"]);
             }
 
-            return new JSONRenderer(["status" => "success", "message" => "パスワードリセット用のメールを送信しました"]);
+            FlashData::setFlashData("success", "パスワードリセット用のメールを送信しました");
+            return new JSONRenderer(["status" => "success", "redirectUrl" => "/password/forgot"]);
         } catch (\Exception $e) {
             error_log($e->getMessage());
             return new JSONRenderer(["status" => "error", "message" => "エラーが発生しました"]);
