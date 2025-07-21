@@ -1,12 +1,20 @@
 document.addEventListener("DOMContentLoaded", async function () {
-    const forgotForm = document.querySelector("#password-reset-form");
+    const resetForm = document.querySelector("#password-reset-form");
+    const resetBtn = document.querySelector("#password-reset-btn");
+    const resetSpinner = document.querySelector("#password-reset-spinner");
 
-    forgotForm.addEventListener("submit", async function (event) {
+    resetForm.addEventListener("submit", async function (event) {
         event.preventDefault();
         resetFormValidations();
 
-        const formData = new FormData(forgotForm);
+        resetBtn.disabled = true;
+        resetSpinner.classList.remove("d-none");
+
+        const formData = new FormData(resetForm);
         const responseJson = await sendPostRequest("/form/password/reset", formData);
+
+        resetBtn.disabled = false;
+        resetSpinner.classList.add("d-none");
 
         if (responseJson === null) {
             alert("エラーが発生しました");

@@ -1,12 +1,20 @@
 document.addEventListener("DOMContentLoaded", async function () {
     const forgotForm = document.querySelector("#password-forgot-form");
+    const forgotBtn = document.querySelector("#password-forgot-btn");
+    const forgotSpinner = document.querySelector("#password-forgot-spinner");
 
     forgotForm.addEventListener("submit", async function (event) {
         event.preventDefault();
         resetFormValidations();
 
+        forgotBtn.disabled = true;
+        forgotSpinner.classList.remove("d-none");
+
         const formData = new FormData(forgotForm);
         const responseJson = await sendPostRequest("/form/password/forgot", formData);
+
+        forgotBtn.disabled = false;
+        forgotSpinner.classList.add("d-none");
 
         if (responseJson === null) {
             alert("エラーが発生しました");
@@ -20,11 +28,11 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
 
         if (responseJson.status === "success") {
-            console.log(responseJson.message);
+            window.location.href = responseJson.redirectUrl;
         }
 
         if (responseJson.status === "error") {
-            console.error(responseJson.message);
+            alert(responseJson.message);
         }
     });
 });
