@@ -3,12 +3,17 @@
         <div class="col-md-6 offset-md-3">
             <div class="card py-5 px-3 my-3">
                 <h2 class="text-center mb-4">メールアドレス検証</h2>
-                <form id="verify-resend-form" >
+                <form id="verify-resend-form">
                     <input type="hidden" name="csrf_token" value="<?= Helpers\CrossSiteForgeryProtection::getToken(); ?>">
                     <p class="text-center mb-0">検証メールからメールアドレス検証を完了させてください。</p>
                     <p class="text-center">検証メールが届いていない、もしくはリンクの有効期限が切れている場合は、下のボタンより再送信することができます。</p>
                     <div class="text-center mt-5">
-                        <button id="email-verification-resend-btn" type="submit" class="btn btn-primary w-180">検証用メールを再送信する</button>
+                        <button id="verify-resend-btn" type="submit" class="btn btn-primary" style="width: 10%; min-width: 100px;">
+                            <span>再送信</span>
+                            <div id="verify-resend-spinner" class="spinner-border text-light spinner-border-sm d-none" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </button>
                     </div>
                 </form>
             </div>

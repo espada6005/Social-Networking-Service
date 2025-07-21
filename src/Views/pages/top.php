@@ -57,8 +57,8 @@
                         <div id="email-error-msg" class="invalid-feedback"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="password" class="form-label">パスワード</label>
-                        <span class="form-text m-0 ms-2">(8〜30文字 + 大文字/小文字/数字/記号 必須)</span>
+                        <label for="password" class="form-label mb-0">パスワード</label>
+                        <div class="form-text mt-0 mb-1">(8〜30文字 + 大文字/小文字/数字/記号 必須)</div>
                         <input type="password" class="form-control" id="password" name="password">
                         <div id="password-error-msg" class="invalid-feedback"></div>
                     </div>
@@ -67,7 +67,12 @@
                         <input type="password" class="form-control" id="confirm-password" name="confirm-password">
                         <div id="confirm-password-error-msg" class="invalid-feedback"></div>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100" id="register-btn">登録</button>
+                    <button type="submit" class="btn btn-primary w-100" id="register-btn">
+                        <span>登録</span>
+                        <div id="register-spinner" class="spinner-border text-light spinner-border-sm d-none" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </button>
                 </form>
             </div>
         </div>

@@ -19,8 +19,8 @@
                     </div>
                     <div class="text-center mt-5">
                         <button id="password-reset-btn" type="submit" class="btn btn-primary w-100">
-                            パスワードリセット
-                            <div id="btn-spinner" class="spinner-border spinner-border-sm text-light d-none" role="status">
+                            <span>パスワードリセット</span>
+                            <div id="password-reset-spinner" class="spinner-border spinner-border-sm text-light d-none" role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
                         </button>

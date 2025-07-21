@@ -14,7 +14,10 @@
                     </div>
                     <div class="text-center mt-5">
                         <button id="password-forgot-btn" type="submit" class="btn btn-primary w-100">
-                            送信
+                            <span>送信</span>
+                            <div id="password-forgot-spinner" class="spinner-border text-light spinner-border-sm d-none" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
                         </button>
                     </div>
                 </form>
