@@ -1,8 +1,12 @@
 @charset "UTF-8";
 
 body {
-    height: 100vh;
+    min-height: 100vh;
+    height: auto;
+    margin: 0;
     background: linear-gradient(45deg, #3191f0, #a99ffe);
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 header {
