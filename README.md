@@ -38,4 +38,48 @@ Webアプリケーション開発における様々な要素をより深く理�
 
 ログイン画面
 
-<img src="docs/captures/login.png" style="width: 60%;">
+<img src="docs/captures/login.png" style="width: 70%;">
+
+ユーザー登録・認証
+登録時にはメールアドレス検証が必要です。
+
+<img src="docs/captures/register.png" style="width: 70%;">
+<img src="docs/captures/mail.png" style="width: 70%;">
+
+パスワードを忘れた場合はリセットすることも可能です
+
+<img src="docs/captures/forget.png" style="width: 70%;">
+
+タイムライン
+
+<img src="docs/captures/trend.png" style="width: 70%;">
+<img src="docs/captures/follow.png" style="width: 70%;">
+
+ポスト
+
+ポスト投稿  
+<img src="docs/captures/post.png" style="width: 70%;">
+
+ポスト返信  
+<img src="docs/captures/reply.png" style="width: 70%;">
+
+ポスト詳細  
+<img src="docs/captures/post-detail.png" style="width: 70%;">
+
+ユーザープロフィール  
+<img src="docs/captures/profile.png" style="width: 70%;">
+<img src="docs/captures/profile-edit.png" style="width: 70%;">
+<img src="docs/captures/followee.png" style="width: 70%;">
+
+メッセージ  
+<img src="docs/captures/chat-icon.png" style="width: 70%;">
+<img src="docs/captures/chat.png" style="width: 70%;">
+<img src="docs/captures/chat-user.png" style="width: 70%;">
+
+通知  
+<img src="docs/captures/notification.png" style="width: 70%;">
+
+スマホ版
+
+<img src="docs/captures/trend-sp.png" style="width: 30%; margin-right: 5px">
+<img src="docs/captures/profile-sp.png" style="width: 30%;>
