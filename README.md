@@ -121,5 +121,7 @@ Webアプリケーション開発における様々な要素をより深く理�
 
 ### スマホ版
 
+<div>
 <img src="docs/captures/trend-sp.png" style="width: 30%;">
 <img src="docs/captures/profile-sp.png" style="width: 30%;">
+</div>
