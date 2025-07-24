@@ -112,7 +112,7 @@ Webアプリケーション開発における様々な要素をより深く理�
 
 ### 通知 
 
-サイドメニューの通知をクリックすると、自分以外のユーザーからの
+サイドメニューの通知をクリックすると、自分以外のユーザーからの  
 「いいね」「リプライ」「フォロー」「メッセージ」通知を確認することができます。  
 通知をクリックすると、通知に対応する画面に遷移します。  
 また、未確認の通知は背景色が水色になり、サイドメニューにも未確認の通知数が表示されます。  
@@ -121,5 +121,5 @@ Webアプリケーション開発における様々な要素をより深く理�
 
 ### スマホ版
 
-<img src="docs/captures/trend-sp.png" style="width: 30%; margin-right: 5px">
-<img src="docs/captures/profile-sp.png" style="width: 30%;>
+<img src="docs/captures/trend-sp.png" style="width: 30%;">
+<img src="docs/captures/profile-sp.png" style="width: 30%;">
