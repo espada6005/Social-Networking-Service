@@ -25,61 +25,99 @@ Webアプリケーション開発における様々な要素をより深く理�
 | ユーザーログイン |
 | パスワードリセット |
 | ユーザープロフィール設定 |
-| ポスト投稿 |
-| ポスト予約投稿 |
-| リプライ投稿 |
-| ポスト（リプライ）削除 |
-| ポストいいね |
+| 投稿 |
+| 予約投稿 |
+| リプライ |
+| 投稿（リプライ）削除 |
+| いいね |
 | タイムライン（トレンド, フォロー） |
 | リアルタイムチャット |
 | 通知（フォロー, リプライ, いいね, チャットメッセージ受信） |
 
 ## 使用方法
 
-ログイン画面
+### ログイン画面
 
 <img src="docs/captures/login.png" style="width: 70%;">
 
-ユーザー登録・認証
-登録時にはメールアドレス検証が必要です。
+### ユーザー登録・認証
+
+登録時にはメールアドレス検証(制限時間付き)が必要です。
 
 <img src="docs/captures/register.png" style="width: 70%;">
 <img src="docs/captures/mail.png" style="width: 70%;">
 
-パスワードを忘れた場合はリセットすることも可能です
+### パスワードリセット
+
+パスワードを忘れた場合はリセットすることも可能です。
 
 <img src="docs/captures/forget.png" style="width: 70%;">
 
-タイムライン
+### タイムライン
+
+タイムラインはトレンドとフォローをタブで切り替えることができます。  
+トレンドはいいね数が多い順で表示します。  
+フォローは自分とフォロワーの投稿を作成日順で表示します。
 
 <img src="docs/captures/trend.png" style="width: 70%;">
 <img src="docs/captures/follow.png" style="width: 70%;">
 
-ポスト
+### 投稿
 
-ポスト投稿  
+サイドメニューの「投稿」をクリックすると、ポスト作成用のモーダルが開きます。  
+「予約する」をオンにし、日時を指定(YYYY/MM/DD HH:MM)することで、指定した時間に投稿することできます。  
+
 <img src="docs/captures/post.png" style="width: 70%;">
 
-ポスト返信  
+### リプライ
+
+投稿の左下のリプライアイコンをクリックすることで、リプライを作成することができます。  
+リプライでは予約投稿はできません。
+
 <img src="docs/captures/reply.png" style="width: 70%;">
 
-ポスト詳細  
+### 詳細
+
+投稿をクリックすると、詳細画面に遷移し、当該投稿とそれ紐づくリプライを表示します。
+
 <img src="docs/captures/post-detail.png" style="width: 70%;">
 
-ユーザープロフィール  
+### ユーザープロフィール
+
+サイドメニューの「プロフィール」またはユーザーのアイコンやユーザー名をクリックすることでユーザープロフィール画面に遷移します。  
+プロフィール画面ではユーザー情報とそのユーザーの「投稿」「リプライ」「いいね」が表示されます
+
 <img src="docs/captures/profile.png" style="width: 70%;">
+
+自分のプロフィール画面ではプロフィール編集ボタンが表示され、プロフィールを編集し、更新することができます。  
+
 <img src="docs/captures/profile-edit.png" style="width: 70%;">
+
+フォローやフォロワーのリンクを押すとそれぞれの一覧が表示されます。  
+
 <img src="docs/captures/followee.png" style="width: 70%;">
 
-メッセージ  
+### メッセージ
+
+ユーザー同士でリアルタイムチャット(テキストのみ)を行えます。  
+ユーザープロフィール画面にある✉アイコンからチャットページに遷移します。  
+
 <img src="docs/captures/chat-icon.png" style="width: 70%;">
 <img src="docs/captures/chat.png" style="width: 70%;">
+
+サイドメニューの「メッセージ」をクリックすると、すでにチャットを行っているユーザーの一覧が表示されます。
+
 <img src="docs/captures/chat-user.png" style="width: 70%;">
 
-通知  
+### 通知 
+
+サイドメニューの通知をクリックすると、自分以外のユーザーからの「いいね」「リプライ」「フォロー」「メッセージ」通知を確認することができます。  
+通知をクリックすると、通知に対応する画面に遷移します。  
+また、未確認の通知は背景色が水色になり、サイドメニューにも未確認の通知数が表示されます。  
+
 <img src="docs/captures/notification.png" style="width: 70%;">
 
-スマホ版
+### スマホ版
 
 <img src="docs/captures/trend-sp.png" style="width: 30%; margin-right: 5px">
 <img src="docs/captures/profile-sp.png" style="width: 30%;>
