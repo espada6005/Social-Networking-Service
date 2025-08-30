@@ -2,8 +2,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     /**
      * チャットユーザー初期化処理
      */
-    const listEl = document.getElementById("chat-usres-list");
-    const spinner = document.getElementById("spinner");
+    const listEl = document.querySelector("#chat-usres-list");
+    const spinner = document.querySelector("#spinner");
     const limit = 30;
     let offset = 0;
     let loadAll = false;
@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 loadAll = true;
 
                 if (offset === 0) {
-                    const notExistsLabel = document.getElementById("chat-users-not-exists");
+                    const notExistsLabel = document.querySelector("#chat-users-not-exists");
                     notExistsLabel.classList.remove("d-none");
                     return;
                 }
@@ -114,7 +114,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     /**
      * list-wrapperのスクロール時の処理
      */
-    document.getElementById("list-wrapper").addEventListener("scroll", async function () {
+    document.querySelector("#list-wrapper").addEventListener("scroll", async function () {
         const content = this;
 
         // 要素がスクロールの最下部に達したかを確認

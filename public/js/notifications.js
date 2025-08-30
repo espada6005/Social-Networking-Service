@@ -3,8 +3,8 @@ document.addEventListener("DOMContentLoaded", async function () {
      * 通知初期化処理
      */
     const csrfToken = document.querySelector("#csrf-token").dataset.token;
-    const listEl = document.getElementById("notifications-list");
-    const spinner = document.getElementById("spinner");
+    const listEl = document.querySelector("#notifications-list");
+    const spinner = document.querySelector("#spinner");
     const limit = 30;
     let offset = 0;
     let loadAll = false;
@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 loadAll = true;
 
                 if (offset === 0) {
-                    const notExistsLabel = document.getElementById("notifications-not-exists");
+                    const notExistsLabel = document.querySelector("#notifications-not-exists");
                     notExistsLabel.classList.remove("d-none");
                     return;
                 }
@@ -188,7 +188,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     /**
      * list-wrapperのスクロール時の処理
      */
-    document.getElementById("list-wrapper").addEventListener("scroll", async function () {
+    document.querySelector("#list-wrapper").addEventListener("scroll", async function () {
         const content = this;
 
         // 要素がスクロールの最下部に達したかを確認

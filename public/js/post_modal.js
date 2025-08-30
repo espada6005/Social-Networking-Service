@@ -16,19 +16,16 @@ document.addEventListener("DOMContentLoaded", async function () {
      */
     const scheduleSwicher = document.querySelector("#post-schedule");
     const datetimepicker = document.querySelector("#post-datetimepicker");
-    // const draftBtn = document.querySelector("#post-draft-btn");
     const createBtn = document.querySelector("#post-create-btn");
     const scheduleBtn = document.querySelector("#post-schedule-btn");
 
     function toggleUploadBlock() {
         if (scheduleSwicher.checked) {
             datetimepicker.classList.remove("d-none");
-            // draftBtn.classList.add("d-none");
             createBtn.classList.add("d-none");
             scheduleBtn.classList.remove("d-none");
         } else {
             datetimepicker.classList.add("d-none");
-            // draftBtn.classList.remove("d-none");
             createBtn.classList.remove("d-none");
             scheduleBtn.classList.add("d-none");
         }

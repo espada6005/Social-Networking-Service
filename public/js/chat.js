@@ -18,13 +18,13 @@ document.addEventListener("DOMContentLoaded", async function () {
                 const chatUserLinks = document.querySelectorAll(".chat-user-link");
                 chatUserLinks.forEach(l => { l.href = responseJson.userData.profilePath });
 
-                const chatUserImage = document.getElementById("chat-user-image");
+                const chatUserImage = document.querySelector("#chat-user-image");
                 chatUserImage.src = responseJson.userData.profileImagePath;
 
-                const chatUserName = document.getElementById("chat-user-name");
+                const chatUserName = document.querySelector("#chat-user-name");
                 chatUserName.textContent = responseJson.userData.name;
 
-                const chatUserInfo = document.getElementById("chat-user-info");
+                const chatUserInfo = document.querySelector("#chat-user-info");
                 chatUserInfo.classList.remove("d-none");
             }
         } else {
@@ -39,8 +39,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     /**
      * メッセージデータ初期化処理
      */
-    const listEl = document.getElementById("messages");
-    const spinner = document.getElementById("spinner");
+    const listEl = document.querySelector("#messages");
+    const spinner = document.querySelector("#spinner");
     const limit = 30;
     let offset = 0;
     let loadAll = false;
@@ -97,7 +97,7 @@ document.addEventListener("DOMContentLoaded", async function () {
      * スクロールバーを最下部にする
      */
     function scrollbarToBottom() {
-        const messagesWrapper = document.getElementById("messages-wrapper");
+        const messagesWrapper = document.querySelector("#messages-wrapper");
         messagesWrapper.scrollTop = messagesWrapper.scrollHeight;
     }
     scrollbarToBottom();
@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     /**
      * messages-wrapperのスクロール時の処理
      */
-    document.getElementById("messages-wrapper").addEventListener("scroll", async function () {
+    document.querySelector("#messages-wrapper").addEventListener("scroll", async function () {
         const content = this;
 
         // 要素がスクロールの最下部に達したかを確認
@@ -122,8 +122,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     /**
      * 送信ボタンのdisabled切り替え処理
      */
-    const messageInput = document.getElementById("message-input");
-    const btn = document.getElementById("send-button");
+    const messageInput = document.querySelector("#message-input");
+    const btn = document.querySelector("#send-button");
     messageInput.addEventListener("input", (event) => {
         const value = event.target.value.trim();
         if (value.length === 0 || value.length > 200) {
@@ -203,7 +203,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         messageInput.value = "";
 
         // チャットスクロールを最下部に移動
-        const wrapper = document.getElementById("messages-wrapper");
+        const wrapper = document.querySelector("#messages-wrapper");
         wrapper.scrollTop = wrapper.scrollHeight;
     }
 });

@@ -5,8 +5,8 @@ document.addEventListener("DOMContentLoaded", async function () {
      */
     const csrfToken = document.querySelector("#csrf-token").dataset.token;
 
-    const listEl = document.getElementById("followers-list");
-    const spinner = document.getElementById("spinner");
+    const listEl = document.querySelector("#followers-list");
+    const spinner = document.querySelector("#spinner");
     const limit = 30;
     let offset = 0;
     let loadAll = false;
@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         if (responseJson.status === "success") {
             if (responseJson.followers === null) {
-                const userNotFound = document.getElementById("user-not-found");
+                const userNotFound = document.querySelector("#user-not-found");
                 userNotFound.classList.remove("d-none");
                 return;
             }
@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 loadAll = true;
 
                 if (offset === 0) {
-                    const notExistsLabel = document.getElementById("followers-not-exists");
+                    const notExistsLabel = document.querySelector("#followers-not-exists");
                     notExistsLabel.classList.remove("d-none");
                     return;
                 }
@@ -126,7 +126,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     /**
      * list-wrapperのスクロール時の処理
      */
-    document.getElementById("list-wrapper").addEventListener("scroll", async function () {
+    document.querySelector("#list-wrapper").addEventListener("scroll", async function () {
         const content = this;
 
         // 要素がスクロールの最下部に達したかを確認
