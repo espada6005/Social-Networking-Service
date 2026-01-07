@@ -7,8 +7,8 @@
 ![MySQL](https://img.shields.io/badge/MySQL-4479A1?logo=mysql&logoColor=white)
 
 ## URL
-https://sns.yua-tech.com
-
+~~https://sns.yua-tech.com~~
+※現在は停止
 
 ## アプリケーション概要
 
